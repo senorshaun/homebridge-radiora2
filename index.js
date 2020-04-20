@@ -64,7 +64,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, lightConfig || lightConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, lightConfig.serial || lightConfig.id);
 
         let lightBulbService = accessory.addService(Service.Lightbulb, accessoryName);
         if (lightConfig.adjustable) {
@@ -76,19 +76,19 @@ class RadioRA2Platform {
 
     }
 
-    addOccupancyAccessory(accessoryUUID, groupConfig) {
+    addOccupancyAccessory(accessoryUUID, occupancySensorConfig) {
 
-        let accessoryName = groupConfig.name;
+        let accessoryName = occupancySensorConfig.name;
         let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-			.setCharacteristic(Characteristic.SerialNumber, groupConfig || groupConfig.id);
+			.setCharacteristic(Characteristic.SerialNumber, occupancySensorConfig.serial || occupancySensorConfig.id);
 
         let occupancyService = accessory.addService(Service.OccupancySensor, accessoryName)
         occupancyService.addOptionalCharacteristic(Characteristic.StatusActive);
 
-        this.accessories[accessory.UUID] = new OccupancySensorAccessory(this.log, groupConfig, accessory, this.radiora2, Homebridge);
+        this.accessories[accessory.UUID] = new OccupancySensorAccessory(this.log, occupancySensorConfig, accessory, this.radiora2, Homebridge);
         this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
 
     }
@@ -100,7 +100,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial || keypadConfig.id);
 		
 		let buttonArray = keypadConfig.buttons || [];
 		buttonArray.forEach(function(buttonConfig) {
@@ -129,7 +129,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial || keypadConfig.id);
 		
 		let buttonArray = keypadConfig.buttons || [];
 		buttonArray.forEach(function(buttonConfig) {
@@ -203,26 +203,26 @@ class RadioRA2Platform {
             this.log("Loaded " + lightsArray.length + " light(s)");
 
             //////////////////////////
-            // Groups
-            let groupsArray = this.config.groups || [];
-            groupsArray.forEach(function (groupConfig) {
-                if ((groupConfig.id) && (groupConfig.name)) {
-                    var uuid = UUIDGen.generate("group:" + groupConfig.id);
-                    let groupAccessory = this.accessories[uuid];
-                    if (!groupAccessory) {
-                        this.addOccupancyAccessory(uuid, groupConfig);
+            // Occupancy Sensors
+            let occupancySensorsArray = this.config.occupancysensors || [];
+            occupancySensorsArray.forEach(function (occupancySensorConfig) {
+                if ((occupancySensorConfig.id) && (occupancySensorConfig.name)) {
+                    var uuid = UUIDGen.generate("group:" + occupancySensorConfig.id);
+                    let occupancySensorAccessory = this.accessories[uuid];
+                    if (!occupancySensorAccessory) {
+                        this.addOccupancyAccessory(uuid, occupancySensorConfig);
                     }
                     else {
-                        this.accessories[uuid] = new OccupancySensorAccessory(this.log, groupConfig, (groupAccessory instanceof OccupancySensorAccessory ? groupAccessory.accessory : groupAccessory), this.radiora2, Homebridge);
+                        this.accessories[uuid] = new OccupancySensorAccessory(this.log, occupancySensorConfig, (occupancySensorAccessory instanceof OccupancySensorAccessory ? occupancySensorAccessory.accessory : occupancySensorAccessory), this.radiora2, Homebridge);
                     }
                     this.accessories[uuid].existsInConfig = true;
-                    this.log("Loaded group '" + groupConfig.name + "'");
+                    this.log("Loaded occupancy sensor '" + occupancySensorConfig.name + "'");
                 }
                 else {
-                    this.log.warn("Invalid Group in config. Not loading it.");
+                    this.log.warn("Invalid occupancy sensor in config. Not loading it.");
                 }
             }.bind(this));
-            this.log("Loaded " + groupsArray.length + " group(s)");
+            this.log("Loaded " + occupancySensorsArray.length + " occupancy sensor(s)");
 
             //////////////////////////
             // Keypads
