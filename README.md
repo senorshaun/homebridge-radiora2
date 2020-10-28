@@ -21,8 +21,8 @@ Lutron RadioRA2 plugin for homebridge
       {
         "name": "Main Lights",
         "id": 14,
-        "serial": "01afwd56"
-        "model": "RRD-6ND-LA"
+        "serial": "01afwd56",
+        "model": "RRD-6ND-LA",
         "adjustable": true
       }
      ],
@@ -45,6 +45,14 @@ Lutron RadioRA2 plugin for homebridge
           }
         ]
       }
+    ],
+    "occupancysensors":[
+      {
+        "name": "Living Room Occupancy Sensor",
+        "id": 6,
+        "serial": "0266473A",
+        "model": "LRF2-OCR2B-P-WH"
+      }
     ]
   }
 ]
@@ -65,7 +73,7 @@ Accessory Types in array groups
 
 Each entry in the array groups have the following
   - name: (required) the name of the accessory
-  - id: (required) the integration ID of that accessory
+  - id: (required) the integration ID of that accessory EXCEPT FOR OCCUPANCY SENSORS. USE THE ROOM ID WHEN SETTING UP OCCUPANCY SENSORS. LUTRON REPORTS THE WHOLE ROOM AS CHANGING STATE WHEN ANY ONE ACCESSORY DOES SO YOU DON'T HAVE TO ADD EACH ONE SEPERATELY
   - serial: (optional) for description, default: <id>
   - model: (optional) for description, default: <accessory type>
 
