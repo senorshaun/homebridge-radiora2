@@ -8,6 +8,8 @@ let LightbulbAccessory = require('./lib/accessories/lightbulb');
 let OccupancySensorAccessory = require('./lib/accessories/occupancysensor');
 let KeypadButtonStatelessAccessory = require('./lib/accessories/statelessswitch');
 let KeypadButtonAccessory = require('./lib/accessories/keypadbutton');
+let VisorControlReceiverAccessory = require('./lib/accessories/visorcontrolreceiver')
+let ThermostatAccessory = require('./lib/accessories/hvaccontroller');
 
 let Homebridge, Accessory, PlatformAccessory, Characteristic, Service, UUIDGen;
 
@@ -140,6 +142,49 @@ class RadioRA2Platform {
         this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
 
     }
+
+    addVisorControlReceiverAccessory(accessoryUUID, visorControlConfig) {
+
+        let accessoryName = visorControlConfig.name;
+        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
+
+        accessory.getService(Service.AccessoryInformation)
+            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
+            .setCharacteristic(Characteristic.SerialNumber, visorControlConfig.serial || visorControlConfig.id);
+        
+        let inputArray = visorControlConfig.inputs || [];
+        inputArray.forEach(function(buttonConfig) {
+            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
+        }.bind(this));
+        let outputArray = visorControlConfig.outputs || [];
+        outputArray.forEach(function(buttonConfig) {
+            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
+        }.bind(this));
+        let buttonArray = visorControlConfig.buttons || [];
+        buttonArray.forEach(function(buttonConfig) {
+            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
+        }.bind(this));
+
+        this.accessories[accessory.UUID] = new VisorControlReceiverAccessory(this.log, visorControlConfig, accessory, this.radiora2, Homebridge);
+        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+
+    }
+
+    addThermostatAccessory(accessoryUUID, hvacControllerConfig) {
+
+        let accessoryName = hvacControllerConfig.name;
+        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
+
+        accessory.getService(Service.AccessoryInformation)
+            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
+            .setCharacteristic(Characteristic.SerialNumber, hvacControllerConfig.serial || hvacControllerConfig.id);
+
+        let hvacControllerService = accessory.addService(Service.Thermostat, accessoryName);
+
+        this.accessories[accessory.UUID] = new ThermostatAccessory(this.log, hvacControllerConfig, accessory, this.radiora2, Homebridge);
+        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+
+    }
 	
     configureAccessory(accessory) {
         this.accessories[accessory.UUID] = accessory;
@@ -242,7 +287,8 @@ class RadioRA2Platform {
                     else {
 						if (keypadConfig.stateless) {
 							this.accessories[uuid] = new KeypadButtonStatelessAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonStatelessAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
-						else {
+						}
+                        else {
 							this.accessories[uuid] = new KeypadButtonAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
 						}
                     }
@@ -255,6 +301,49 @@ class RadioRA2Platform {
             }.bind(this));
             this.log("Loaded " + keypadsArray.length + " keypad(s)");
 
+            //////////////////////////
+            // Visor Control Receivers
+            let visorControlReceiversArray = this.config.visorcontrolreceivers || [];
+            visorControlReceiversArray.forEach(function (visorControlReceiverConfig) {
+                if ((visorControlReceiverConfig.id) && (visorControlReceiverConfig.name)) {
+                    var uuid = UUIDGen.generate("visorcontrolreceiver:" + visorControlReceiverConfig.id);
+                    let visorControlReceiverAccessory = this.accessories[uuid];
+                    if (!visorControlReceiverAccessory) {
+                        this.addVisorControlReceiverAccessory(uuid, visorControlReceiverConfig);
+                    }
+                    else {
+                        this.accessories[uuid] = new VisorControlReceiverAccessory(this.log, visorControlReceiverConfig, (visorControlReceiverAccessory instanceof VisorControlReceiverAccessory ? visorControlReceiverAccessory.accessory : visorControlReceiverAccessory), this.radiora2, Homebridge);
+                    }
+                    this.accessories[uuid].existsInConfig = true;
+                    this.log("Loaded visor control receiver '" + visorControlReceiverConfig.name + "'");
+                }
+                else {
+                    this.log.warn("Invalid visor control receiver in config. Not loading it.");
+                }
+            }.bind(this));
+            this.log("Loaded " + visorControlReceiversArray.length + " visor control receiver(s)");
+
+            //////////////////////////
+            // HVAC Controllers
+            let hvacControllersArray = this.config.hvaccontrollers || [];
+            hvacControllersArray.forEach(function (hvacControllerConfig) {
+                if ((hvacControllerConfig.id) && (hvacControllerConfig.name)) {
+                    var uuid = UUIDGen.generate("hvacController:" + hvacControllerConfig.id);
+                    let hvacControllerAccessory = this.accessories[uuid];
+                    if (!hvacControllerAccessory) {
+                        this.addThermostatAccessory(uuid, hvacControllerConfig);
+                    }
+                    else {
+                        this.accessories[uuid] = new ThermostatAccessory(this.log, hvacControllerConfig, (hvacControllerAccessory instanceof ThermostatAccessory ? hvacControllerAccessory.accessory : hvacControllerAccessory), this.radiora2, Homebridge);
+                    }
+                    this.accessories[uuid].existsInConfig = true;
+                    this.log("Loaded HVAC controller '" + hvacControllerConfig.name + "'");
+                }
+                else {
+                    this.log.warn("Invalid HVAC controller in config. Not loading it.");
+                }
+            }.bind(this));
+            this.log("Loaded " + hvacControllersArray.length + " HVAC controller(s)");
 
             //////////////////////////
             // Remove Deleted
