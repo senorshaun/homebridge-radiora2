@@ -14,7 +14,7 @@ let ThermostatAccessory = require('./lib/accessories/hvaccontroller');
 let Homebridge, Accessory, PlatformAccessory, Characteristic, Service, UUIDGen;
 
 module.exports = function (homebridge) {
-	Homebridge = homebridge;
+    Homebridge = homebridge;
     Accessory = homebridge.hap.Accessory;
     PlatformAccessory = homebridge.platformAccessory;
     Characteristic = homebridge.hap.Characteristic;
@@ -50,7 +50,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, fanConfig.serial || fanConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, fanConfig.serial.toString() || fanConfig.id.toString());
 
         let fanService = accessory.addService(Service.Fan, accessoryName);
 
@@ -58,15 +58,15 @@ class RadioRA2Platform {
         this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
 
     }
-	
-	addLightAccessory(accessoryUUID, lightConfig) {
+    
+    addLightAccessory(accessoryUUID, lightConfig) {
 
         let accessoryName = lightConfig.name;
         let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, lightConfig.serial || lightConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, lightConfig.serial.toString() || lightConfig.id.toString());
 
         let lightBulbService = accessory.addService(Service.Lightbulb, accessoryName);
         if (lightConfig.adjustable) {
@@ -85,7 +85,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-			.setCharacteristic(Characteristic.SerialNumber, occupancySensorConfig.serial || occupancySensorConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, occupancySensorConfig.serial.toString() || occupancySensorConfig.id.toString());
 
         let occupancyService = accessory.addService(Service.OccupancySensor, accessoryName)
         occupancyService.addOptionalCharacteristic(Characteristic.StatusActive);
@@ -102,22 +102,22 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial || keypadConfig.id);
-		
-		let buttonArray = keypadConfig.buttons || [];
-		buttonArray.forEach(function(buttonConfig) {
-			let buttonService = accessory.addService(Service.StatelessProgrammableSwitch, "Button " + buttonConfig.id, "Button " + buttonConfig.id);
-			let switchEventCharacteristic = buttonService.getCharacteristic(Characteristic.ProgrammableSwitchEvent);
-			switchEventCharacteristic.setProps({
-				format: Characteristic.Formats.UINT8,
-				maxValue: 2,
-				minValue: 0,
-				validValues: [0],
-				perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-			});
-			buttonService.getCharacteristic(Characteristic.ServiceLabelIndex).updateValue(buttonConfig.id);
-			buttonService.getCharacteristic(Characteristic.Name).updateValue(buttonConfig.name);
-		}.bind(this));
+            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial.toString() || keypadConfig.id).toString();
+        
+        let buttonArray = keypadConfig.buttons || [];
+        buttonArray.forEach(function(buttonConfig) {
+            let buttonService = accessory.addService(Service.StatelessProgrammableSwitch, "Button " + buttonConfig.id, "Button " + buttonConfig.id);
+            let switchEventCharacteristic = buttonService.getCharacteristic(Characteristic.ProgrammableSwitchEvent);
+            switchEventCharacteristic.setProps({
+                format: Characteristic.Formats.UINT8,
+                maxValue: 2,
+                minValue: 0,
+                validValues: [0],
+                perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+            });
+            buttonService.getCharacteristic(Characteristic.ServiceLabelIndex).updateValue(buttonConfig.id);
+            buttonService.getCharacteristic(Characteristic.Name).updateValue(buttonConfig.name);
+        }.bind(this));
 
         this.accessories[accessory.UUID] = new KeypadButtonStatelessAccessory(this.log, keypadConfig, accessory, this.radiora2, Homebridge);
         this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
@@ -131,12 +131,12 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial || keypadConfig.id);
-		
-		let buttonArray = keypadConfig.buttons || [];
-		buttonArray.forEach(function(buttonConfig) {
-			let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
-		}.bind(this));
+            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial.toString() || keypadConfig.id.toString());
+        
+        let buttonArray = keypadConfig.buttons || [];
+        buttonArray.forEach(function(buttonConfig) {
+            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
+        }.bind(this));
 
         this.accessories[accessory.UUID] = new KeypadButtonAccessory(this.log, keypadConfig, accessory, this.radiora2, Homebridge);
         this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
@@ -150,7 +150,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, visorControlConfig.serial || visorControlConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, visorControlConfig.serial.toString() || visorControlConfig.id.toString());
         
         let inputArray = visorControlConfig.inputs || [];
         inputArray.forEach(function(buttonConfig) {
@@ -177,7 +177,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, hvacControllerConfig.serial || hvacControllerConfig.id);
+            .setCharacteristic(Characteristic.SerialNumber, hvacControllerConfig.serial.toString() || hvacControllerConfig.id.toString());
 
         let hvacControllerService = accessory.addService(Service.Thermostat, accessoryName);
 
@@ -185,7 +185,7 @@ class RadioRA2Platform {
         this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
 
     }
-	
+    
     configureAccessory(accessory) {
         this.accessories[accessory.UUID] = accessory;
     }
@@ -193,17 +193,14 @@ class RadioRA2Platform {
     setupListeners() {
 
         this.log("Attempting connection to " + this.config.repeater + "...");
-        this.radiora2 = new RadioRa2(this.config.repeater, this.config.username, this.config.password);
-        this.radiora2.on("messageReceived", function(data) {
-            this.log("LUTRON >>> " + data);
-        }.bind(this));
+        this.radiora2 = new RadioRa2(this.config.repeater, this.config.username, this.config.password, this.log);
         this.radiora2.connect();
 
         this.radiora2.on("loggedIn", function () {
 
             this.log("Connected to Lutron!");
 
-			//////////////////////////
+            //////////////////////////
             // Fans
             let fansArray = this.config.fans || [];
             fansArray.forEach(function (fanConfig) {
@@ -277,20 +274,20 @@ class RadioRA2Platform {
                     var uuid = UUIDGen.generate("keypad:" + keypadConfig.id);
                     let keypadAccessory = this.accessories[uuid];
                     if (!keypadAccessory) {
-						if (keypadConfig.stateless) {
-							this.addKeypadButtonStatelessAccessory(uuid, keypadConfig);
-						}
-						else {
-							this.addKeypadButtonAccessory(uuid, keypadConfig);
-						}
+                        if (keypadConfig.stateless) {
+                            this.addKeypadButtonStatelessAccessory(uuid, keypadConfig);
+                        }
+                        else {
+                            this.addKeypadButtonAccessory(uuid, keypadConfig);
+                        }
                     }
                     else {
-						if (keypadConfig.stateless) {
-							this.accessories[uuid] = new KeypadButtonStatelessAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonStatelessAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
-						}
+                        if (keypadConfig.stateless) {
+                            this.accessories[uuid] = new KeypadButtonStatelessAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonStatelessAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
+                        }
                         else {
-							this.accessories[uuid] = new KeypadButtonAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
-						}
+                            this.accessories[uuid] = new KeypadButtonAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
+                        }
                     }
                     this.accessories[uuid].existsInConfig = true;
                     this.log("Loaded keypad '" + keypadConfig.name + "'");
@@ -355,6 +352,12 @@ class RadioRA2Platform {
                     this.log("Deleted removed accessory");
                 }
             }.bind(this));
+
         }.bind(this));
+        
+        //Disconnect cleaning when homebridge is shutting down
+        process.on("SIGINT", function() {this.radiora2.disconnect()}.bind(this));
+        process.on("SIGTERM", function() {this.radiora2.disconnect()}.bind(this));
+
     }
 }

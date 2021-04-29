@@ -53,6 +53,43 @@ Lutron RadioRA2 plugin for homebridge
         "serial": "0266473A",
         "model": "LRF2-OCR2B-P-WH"
       }
+    ],
+    "hvaccontrollers":[
+      {
+        "name": "Living Room Thermostat",
+        "id": 36,
+        "serial": "0266473A",
+        "model": "LR-HWLV-HVAC",
+        "heatOnly": true //this is optional
+      }
+    ],
+        "visorcontrolreceivers":[
+      {
+        "name": "Garage Visor Control Receiver",
+        "id": 22,
+        "serial": "0266473A",
+        "model": "RR-VCRX-WH",
+        "buttons":[
+          {
+            "name": "Garage Lights 100",
+            "id": 1,
+            "led": 81
+          }
+        ],
+        "inputs":[
+          {
+            "name": "Garage Door Closed",
+            "id": 3,
+            "led": 83
+          }
+        ],
+        "outputs":[
+          {
+            "name": "Garage Door Control",
+            "id": 5
+          }
+        ]
+      }
     ]
   }
 ]
@@ -70,6 +107,8 @@ Accessory Types in array groups
   - fans
   - occupancysensors
   - keypads
+  - hvaccontrollers
+  - visorcontrolreceivers
 
 Each entry in the array groups have the following
   - name: (required) the name of the accessory
@@ -89,6 +128,9 @@ Each button in the array has
   - name: (required) engraving name
   - id: (required) integration ID of that button
   - led: (required) the integration ID of that button used for statusing
+  
+HVAC Controlelrs
+ - heatOnly: (optional) will only allow the homekit thermostat to have the Off and Heat modes
 
 # Roadmap
 - Shades eventually
