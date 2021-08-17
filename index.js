@@ -50,7 +50,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, fanConfig.serial.toString() || fanConfig.id.toString());
+            .setCharacteristic(Characteristic.SerialNumber, (fanConfig.serial|| "Fan" + fanConfig.id).toString());
 
         let fanService = accessory.addService(Service.Fan, accessoryName);
 
@@ -66,7 +66,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, lightConfig.serial.toString() || lightConfig.id.toString());
+            .setCharacteristic(Characteristic.SerialNumber, (lightConfig.serial || "Light" + lightConfig.id).toString());
 
         let lightBulbService = accessory.addService(Service.Lightbulb, accessoryName);
         if (lightConfig.adjustable) {
@@ -85,7 +85,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, occupancySensorConfig.serial.toString() || occupancySensorConfig.id.toString());
+            .setCharacteristic(Characteristic.SerialNumber, (occupancySensorConfig.serial || "Occ" + occupancySensorConfig.id).toString());
 
         let occupancyService = accessory.addService(Service.OccupancySensor, accessoryName)
         occupancyService.addOptionalCharacteristic(Characteristic.StatusActive);
@@ -102,7 +102,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial.toString() || keypadConfig.id).toString();
+            .setCharacteristic(Characteristic.SerialNumber, (keypadConfig.serial || "Keypad" + keypadConfig.id).toString());
         
         let buttonArray = keypadConfig.buttons || [];
         buttonArray.forEach(function(buttonConfig) {
@@ -131,7 +131,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, keypadConfig.serial.toString() || keypadConfig.id.toString());
+            .setCharacteristic(Characteristic.SerialNumber, (keypadConfig.serial || "Keypad" + keypadConfig.id).toString());
         
         let buttonArray = keypadConfig.buttons || [];
         buttonArray.forEach(function(buttonConfig) {
@@ -150,7 +150,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, visorControlConfig.serial.toString() || visorControlConfig.id.toString());
+            .setCharacteristic(Characteristic.SerialNumber, (visorControlConfig.serial || "VCR" + visorControlConfig.id).toString());
         
         let inputArray = visorControlConfig.inputs || [];
         inputArray.forEach(function(buttonConfig) {
@@ -177,7 +177,7 @@ class RadioRA2Platform {
 
         accessory.getService(Service.AccessoryInformation)
             .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, hvacControllerConfig.serial.toString() || hvacControllerConfig.id.toString());
+            .setCharacteristic(Characteristic.SerialNumber, (hvacControllerConfig.serial || "HVAC" + hvacControllerConfig.id).toString());
 
         let hvacControllerService = accessory.addService(Service.Thermostat, accessoryName);
 
