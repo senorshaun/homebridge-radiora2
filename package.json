@@ -1,6 +1,6 @@
 {
   "name": "homebridge-radiora2",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Homebridge Platform for Lutron RadioRa2",
   "main": "index.js",
   "scripts": {
@@ -15,8 +15,7 @@
   },
   "author": "SenorShaun",
   "license": "MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "engines": {
     "node": ">=0.12.0",
     "homebridge": ">=0.2.0"
