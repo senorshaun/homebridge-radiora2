@@ -23,6 +23,14 @@ module.exports = function (homebridge) {
 
     homebridge.registerPlatform('homebridge-radiora2', 'RadioRA2', RadioRA2Platform, true);
 };
+    
+function addDefaultValues(deviceConfig, deviceType) {
+    deviceConfig.name   = (deviceConfig.name   || deviceType + " " + deviceConfig.id ).toString();
+    deviceConfig.model  = (deviceConfig.model  || "Homebridge-RadioRa2-" + deviceType).toString();
+    deviceConfig.serial = (deviceConfig.serial || deviceType + deviceConfig.id	     ).toString();
+    return deviceConfig
+}
+
 
 class RadioRA2Platform {
 
@@ -204,8 +212,9 @@ class RadioRA2Platform {
             // Fans
             let fansArray = this.config.fans || [];
             fansArray.forEach(function (fanConfig) {
+		fanConfig = addDefaultValues(fanConfig, "Fan");
                 if ((fanConfig.id) && (fanConfig.name)) {
-                    var uuid = UUIDGen.generate("light:" + fanConfig.id);
+                    var uuid = UUIDGen.generate("fan:" + fanConfig.id);
                     let fanAccessory = this.accessories[uuid];
                     if (!fanAccessory) {
                         this.addFanAccessory(uuid, fanConfig);
@@ -226,6 +235,7 @@ class RadioRA2Platform {
             // Lights
             let lightsArray = this.config.lights || [];
             lightsArray.forEach(function (lightConfig) {
+		lightConfig = addDefaultValues(lightConfig, "Light");
                 if ((lightConfig.id) && (lightConfig.name)) {
                     var uuid = UUIDGen.generate("light:" + lightConfig.id);
                     let lightAccessory = this.accessories[uuid];
@@ -248,6 +258,7 @@ class RadioRA2Platform {
             // Occupancy Sensors
             let occupancySensorsArray = this.config.occupancysensors || [];
             occupancySensorsArray.forEach(function (occupancySensorConfig) {
+		occupancySensorConfig = addDefaultValues(occupancySensorConfig, "Occupancy");
                 if ((occupancySensorConfig.id) && (occupancySensorConfig.name)) {
                     var uuid = UUIDGen.generate("group:" + occupancySensorConfig.id);
                     let occupancySensorAccessory = this.accessories[uuid];
@@ -270,6 +281,7 @@ class RadioRA2Platform {
             // Keypads
             let keypadsArray = this.config.keypads || [];
             keypadsArray.forEach(function (keypadConfig) {
+		keypadConfig = addDefaultValues(keypadConfig, "Keypad");
                 if ((keypadConfig.id) && (keypadConfig.name)) {
                     var uuid = UUIDGen.generate("keypad:" + keypadConfig.id);
                     let keypadAccessory = this.accessories[uuid];
@@ -302,6 +314,7 @@ class RadioRA2Platform {
             // Visor Control Receivers
             let visorControlReceiversArray = this.config.visorcontrolreceivers || [];
             visorControlReceiversArray.forEach(function (visorControlReceiverConfig) {
+		visorControlReceiverConfig = addDefaultValues(visorControlReceiverConfig, "VisorControlReceiver");
                 if ((visorControlReceiverConfig.id) && (visorControlReceiverConfig.name)) {
                     var uuid = UUIDGen.generate("visorcontrolreceiver:" + visorControlReceiverConfig.id);
                     let visorControlReceiverAccessory = this.accessories[uuid];
@@ -324,6 +337,7 @@ class RadioRA2Platform {
             // HVAC Controllers
             let hvacControllersArray = this.config.hvaccontrollers || [];
             hvacControllersArray.forEach(function (hvacControllerConfig) {
+		hvacControllerConfig = addDefaultValues(hvacControllerConfig, "hvacController");
                 if ((hvacControllerConfig.id) && (hvacControllerConfig.name)) {
                     var uuid = UUIDGen.generate("hvacController:" + hvacControllerConfig.id);
                     let hvacControllerAccessory = this.accessories[uuid];
