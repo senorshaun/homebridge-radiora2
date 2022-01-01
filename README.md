@@ -24,6 +24,9 @@ Lutron RadioRA2 plugin for homebridge
         "serial": "01afwd56",
         "model": "RRD-6ND-LA",
         "adjustable": true
+      },
+      {
+        "id": 15,
       }
      ],
      "fans":[
@@ -111,8 +114,8 @@ Accessory Types in array groups
   - visorcontrolreceivers
 
 Each entry in the array groups have the following
-  - name: (required) the name of the accessory
   - id: (required) the integration ID of that accessory EXCEPT FOR OCCUPANCY SENSORS. USE THE ROOM ID WHEN SETTING UP OCCUPANCY SENSORS. LUTRON REPORTS THE WHOLE ROOM AS CHANGING STATE WHEN ANY ONE ACCESSORY DOES SO YOU DON'T HAVE TO ADD EACH ONE SEPERATELY
+  - name: (optional) the name of the accessory
   - serial: (optional) for description, default: <id>
   - model: (optional) for description, default: <accessory type>
 
@@ -125,8 +128,8 @@ Keypads
   - buttons: (required) array group defining the buttons on the keypad exposed to HomeKit
 
 Each button in the array has
-  - name: (required) engraving name
   - id: (required) integration ID of that button
+  - name: (optional) engraving name
   - led: (required) the integration ID of that button used for statusing
   
 HVAC Controlelrs
