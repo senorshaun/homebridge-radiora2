@@ -1,24 +1,54 @@
 {
-  "name": "homebridge-radiora2",
-  "version": "1.3.1",
-  "description": "Homebridge Platform for Lutron RadioRa2",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "_from": "homebridge-radiora2@latest",
+  "_id": "homebridge-radiora2@1.3.3",
+  "_inBundle": false,
+  "_integrity": "sha512-XKZo6wioXgsPDpHmpTlUOIPvCQm5E7SzwDD5B0M16ROh7vJ+ifPJTOJ7cpVik2u6JTyCxpAFDdz9pLGs0REntA==",
+  "_location": "/homebridge-radiora2",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "homebridge-radiora2@latest",
+    "name": "homebridge-radiora2",
+    "escapedName": "homebridge-radiora2",
+    "rawSpec": "latest",
+    "saveSpec": null,
+    "fetchSpec": "latest"
   },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/homebridge-radiora2/-/homebridge-radiora2-1.3.3.tgz",
+  "_shasum": "cd1c06e01b0e94a28b282c0f84c19cf1f2ddc2d1",
+  "_spec": "homebridge-radiora2@latest",
+  "_where": "/usr",
+  "author": {
+    "name": "SenorShaun"
+  },
+  "bugs": {
+    "url": "https://github.com/senorshaun/homebridge-radiora2/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {},
+  "deprecated": false,
+  "description": "Homebridge Platform for Lutron RadioRa2",
+  "engines": {
+    "homebridge": ">=0.2.0",
+    "node": ">=0.12.0"
+  },
+  "homepage": "https://github.com/senorshaun/homebridge-radiora2#readme",
   "keywords": [
     "homebridge-plugin"
   ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "homebridge-radiora2",
   "repository": {
     "type": "git",
     "url": "git://github.com/senorshaun/homebridge-radiora2.git"
   },
-  "author": "SenorShaun",
-  "license": "MIT",
-  "dependencies": {
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
-  }
+  "version": "1.3.3"
 }
