@@ -1,0 +1,140 @@
+<script crossorigin="anonymous" src="js/jquery.slim.js"></script>
+
+<div class="text-center">
+	<button class="btn btn-primary" id="getAllDevices" type="button">Discover All Devices</button>
+</div>
+
+<script>
+	const homebridge = window.homebridge;
+	const $ = jQuery = window.jQuery;
+
+	(async () => {
+		homebridge.showSpinner();
+
+		// get the initial config - this is an array potentially containing multiple config blocks
+		const pluginConfig = await homebridge.getPluginConfig();
+		const configSchema = await homebridge.getPluginConfigSchema();
+
+		if (!pluginConfig.length) {
+			pluginConfig.push({});
+		}
+		var config = pluginConfig[0];
+
+		function createForm(configSchema, config) {
+			const configForm = homebridge.createForm(configSchema, config);
+			configForm.onChange(async (changes) => {
+				await homebridge.updatePluginConfig([changes]);
+			})
+		}
+
+		$('#getAllDevices').on('click', async function() {
+			var btn = $(this);
+			btn.prop('disabled', true).html('<div class="spinner-border" role="status"><span class="sr-only">Discovering...</span></div>')
+
+			const data = await homebridge.request('/get-all-devices', { repeater: config.repeater });
+			if (data.success) {
+				var filteredDevices = [];
+				var successMessage = '';
+				var addedButtons = 0;
+				// add new lights
+				if (data.lights.length > 0 ) {
+					if (config.lights) {
+						filteredDevices = data.lights.filter(newdevice => !config.lights.find(existingdevice => existingdevice.id === newdevice.id));
+					} else {
+						config.lights = [];
+						filteredDevices = data.lights;
+					}
+					config.lights.push(...filteredDevices);
+					successMessage += 'Added ' + filteredDevices.length + ' new lights. ';
+				}
+				// add new fans
+				if (data.fans.length > 0 ) {
+					if (config.fans) {
+						filteredDevices = data.fans.filter(newdevice => !config.fans.find(existingdevice => existingdevice.id === newdevice.id));
+					} else {
+						config.fans = [];
+						filteredDevices = data.fans;
+					}
+					config.fans.push(...filteredDevices);
+					successMessage += 'Added ' + filteredDevices.length + ' new fans. ';
+				}
+				// add new keyapds
+				if (data.keypads.length > 0 ) {
+					//check for new buttons on existing keypads
+					if (config.keypads) {
+						filteredDevices = data.keypads.filter(newdevice => !config.keypads.find(existingdevice => existingdevice.id === newdevice.id));
+						filteredDevices.map(device =>{
+							if (config.keypads.find(existingdevice => existingdevice.id === device.id).buttons) {
+								filteredButtons =  device.buttons.filter(newbutton => !(config.keypads.find(existingdevice => existingdevice.id === device.id)).buttons.find(existingdevice => existingdevice.id === newbutton.id));
+							} else {
+								config.keypads.find(existingdevice => existingdevice.id === device.id).buttons = [];
+								filteredDevices = device.buttons;
+							}
+							(config.keypads.find(existingdevice => existingdevice.id === device.id)).buttons.push(...filteredButtons);
+							addedButtons += filteredButtons.length;
+						});
+						if (addedButtons > 0) {
+							successMessage += 'Added ' + addedButtons + ' new buttons to existing keypads. ';
+						}
+					} else {
+						config.keypads = [];
+						filteredDevices = data.keypads;
+					}
+					filteredDevices = data.keypads.filter(newdevice => !config.keypads.find(existingdevice => existingdevice.id === newdevice.id));
+					config.keypads.push(...filteredDevices);
+					successMessage += 'Added ' + filteredDevices.length + ' new keypads. ';
+				}
+				// add new occupancy sensors
+				if (data.occupancysensors.length > 0 ) {
+					if (config.occupancysensors) {
+						filteredDevices = data.occupancysensors.filter(newdevice => !config.occupancysensors.find(existingdevice => existingdevice.id === newdevice.id));
+					} else {
+						config.occupancysensors = [];
+						filteredDevices = data.occupancysensors;
+					}
+					config.occupancysensors.push(...filteredDevices);
+					successMessage += 'Added ' + filteredDevices.length + ' new occupancy sensors. ';
+				}
+				// add new hvac controllers
+				if (data.hvaccontrollers.length > 0 ) {
+					if (config.hvaccontrollers) {
+						filteredDevices = data.hvaccontrollers.filter(newdevice => !config.hvaccontrollers.find(existingdevice => existingdevice.id === newdevice.id));
+					} else {
+						config.hvaccontrollers = [];
+						filteredDevices = data.hvaccontrollers;
+					}
+					config.hvaccontrollers.push(...filteredDevices);
+					successMessage += 'Added ' + filteredDevices.length + ' new hvac controllers. ';
+				}
+				// add new visor control receivers
+				if (data.visorcontrolreceivers.length > 0 ) {
+					if (config.visorcontrolreceivers) {
+						filteredDevices = data.visorcontrolreceivers.filter(newdevice => !config.visorcontrolreceivers.find(existingdevice => existingdevice.id === newdevice.id));
+					} else {
+						config.visorcontrolreceivers = [];
+						filteredDevices = data.visorcontrolreceivers;
+					}
+					successMessage += 'Added ' + filteredDevices.length + ' new visor control receivers. ';
+				}
+				if (successMessage === '') {
+					homebridge.toast.success('No new devices found.');
+				} else {
+					await homebridge.updatePluginConfig([config]);
+					createForm(configSchema, config);
+					homebridge.toast.success(successMessage + 'Make any device customizations, save and restart Homebridge to apply changes.');
+				}
+			} else if (typeof data.success === 'undefined' || data.success === false) {
+				homebridge.toast.error(data.error, 'Discover Error');
+			} else {
+				homebridge.toast.error('Could not discover from the repeater due to an unknown error.', 'Unknown Error');
+			}
+			btn.prop('disabled', false).html("Discover All Devices");
+
+		});
+
+		homebridge.hideSpinner();
+		createForm(configSchema, config);
+		
+	})();
+
+</script>

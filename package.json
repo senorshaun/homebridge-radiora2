@@ -1,13 +1,15 @@
 {
   "name": "homebridge-radiora2",
-  "version": "1.3.6",
+  "version": "1.5.1",
   "description": "Homebridge Platform for Lutron RadioRa2",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "radiora2",
+    "lutron"
   ],
   "repository": {
     "type": "git",
@@ -15,9 +17,13 @@
   },
   "author": "SenorShaun",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@homebridge/plugin-ui-utils": "^0.0.19",
+    "axios": "^0.27.2",
+    "xml2js": "^0.4.23"
+  },
   "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+    "node": ">=14.0.0",
+    "homebridge": ">=1.3.0"
   }
 }

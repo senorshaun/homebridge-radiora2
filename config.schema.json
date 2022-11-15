@@ -1,0 +1,794 @@
+{
+	"pluginAlias": "RadioRA2",
+	"pluginType": "platform",
+	"singular": true,
+	"customUi": true,
+	"schema": {
+		"type": "object",
+		"properties": {
+			"name": {
+				"title": "Name",
+				"type": "string",
+				"required": true,
+				"default": "RadioRA2",
+				"description": "Name of the system as seen in homebridge logs."
+			},
+			"repeater": {
+				"title": "Main Repeater IP Address",
+				"type": "string",
+				"format": "ipv4",
+				"required": true
+			},
+			"username": {
+				"title":"Integration Username",
+				"type": "string",
+				"required":true
+			},
+			"password": {
+				"title":"Integration Password",
+				"type": "string",
+				"required":true
+			},
+			"lights": {
+				"type": "array",
+				"required": false,
+				"items": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Device Integration ID",
+							"type": "integer",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.lights[arrayIndices].exclude;"
+							}
+						},
+						"name": {
+							"title": "Name",
+							"type": "string",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.lights[arrayIndices].exclude;"
+							}
+						},
+						"serial": {
+							"title": "Serial Number",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.lights[arrayIndices].exclude;"
+							}
+						},
+						"model": {
+							"title": "Model",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.lights[arrayIndices].exclude;"
+							}
+						},
+						"adjustable": {
+							"title": "Dimmable",
+							"type": "boolean",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.lights[arrayIndices].exclude;"
+							}
+						},
+						"onvalue": {
+							"title": "On Value",
+							"type": "integer",
+							"minimum": 0,
+							"maximum": 100,
+							"required": false,
+							"description": "Value the light will be set to when turned 'on' by HomeKit. Defaults to 100% if not set.",
+							"condition": {
+								"functionBody": "return (!model.lights[arrayIndices].exclude && model.lights[arrayIndices].adjustable === true);"
+							}
+						},
+						"exclude": {
+							"title": "Exclude from HomeKit",
+							"type": "boolean",
+							"required": false
+						}
+					}
+				}
+			},
+			"fans": {
+				"type": "array",
+				"required": false,
+				"items": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Device Integration ID",
+							"type": "integer",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.fans[arrayIndices].exclude;"
+							}
+						},
+						"name": {
+							"title": "Name",
+							"type": "string",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.fans[arrayIndices].exclude;"
+							}
+						},
+						"serial": {
+							"title": "Serial Number",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.fans[arrayIndices].exclude;"
+							}
+						},
+						"model": {
+							"title": "Model",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.fans[arrayIndices].exclude;"
+							}
+						},
+						"adjustable": {
+							"title": "Adjustable",
+							"type": "boolean",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.fans[arrayIndices].exclude;"
+							}
+						},
+						"onvalue": {
+							"title": "On Value",
+							"type": "integer",
+							"oneOf": [
+								{
+									"enum": [25],
+									"title": "Low"
+								},
+								{
+									"enum": [50],
+									"title": "Medium"
+								},
+								{
+									"enum": [75],
+									"title": "Medium-high"
+								},
+								{
+									"enum": [100],
+									"title": "High"
+								}
+							],
+							"required": false,
+							"description": "Value the fan will be set to when turned 'on' by HomeKit. Defaults to Medium-high if not set.",
+							"condition": {
+								"functionBody": "return (model.fans[arrayIndices].adjustable === true && !model.fans[arrayIndices].exclude);"
+							}
+						},
+						"exclude": {
+							"title": "Excluded from HomeKit",
+							"type": "boolean",
+							"required": false
+						}
+					}
+				}
+			},
+			"keypads": {
+				"type": "array",
+				"required": false,
+				"items": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Device Integrtion ID",
+							"type": "integer",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.keypads[arrayIndices].exclude;"
+							}
+						},
+						"name": {
+							"title": "Name",
+							"type": "string",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.keypads[arrayIndices].exclude;"
+							}
+						},
+						"serial": {
+							"title": "Serial Number",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.keypads[arrayIndices].exclude;"
+							}
+						},
+						"model": {
+							"title": "Model",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.keypads[arrayIndices].exclude;"
+							}
+						},
+						"stateless": {
+							"title": "Pico",
+							"type": "boolean",
+							"required": false,
+							"description": "If enabled, homebridge will only listen for button presses from Lutron, it will not send presses to Lutron. Additionally it exposes three HomeKit actions for each button: Single Click, Double Click, Hold.",
+							"condition": {
+								"functionBody": "return !model.keypads[arrayIndices].exclude;"
+							}
+						},
+						"buttons": {
+							"type": "array",
+							"default": [],
+							"required": false,
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"title": "Button ID",
+										"type": "integer",
+										"required": true,
+										"condition": {
+											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
+										}
+									},
+									"led": {
+										"title": "Button LED ID",
+										"type": "integer",
+										"required": true,
+										"condition": {
+											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
+										}
+									},
+									"name": {
+										"title": "Name",
+										"type": "string",
+										"required": true,
+										"condition": {
+											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
+										}
+									},
+									"longpressrepeat": {
+										"title": "Long Press Repeat",
+										"type": "boolean",
+										"required": false,
+										"condition": {
+											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && model.keypads[arrayIndices[0]].stateless && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
+										},
+										"description": "If enabled, the HomeKit button will be repeatedly pressed while the Lutron button is held. Useful for raise/lower actions in HomeKit."
+									},
+									"repeattime": {
+										"title": "Repeat Frequency",
+										"type": "integer",
+										"minimum": 0,
+										"required": false,
+										"condition": {
+											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && model.keypads[arrayIndices[0]].stateless && model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].longpressrepeat && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
+										},
+										"description": "Milliseconds between each HomeKit button press when 'Long Press Repeat' is enabled."
+									},
+									"repeatmax": {
+										"title": "Repeat Count",
+										"type": "integer",
+										"minimum": 0,
+										"required": false,
+										"condition": {
+											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && model.keypads[arrayIndices[0]].stateless  && model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].longpressrepeat && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
+										},
+										"description": "Max number of times a HomeKit button will be pressed when repeated. Used to avoid continual pressing in case of missed Lutron communication."
+									},
+									"clicktime": {
+										"title": "Click Time",
+										"type": "integer",
+										"minimum": 0,
+										"required": false,
+										"condition": {
+											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && model.keypads[arrayIndices[0]].stateless && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
+										},
+										"description": "Millisecond listen time to determine single click, double click, or hold action."
+									},
+									"exclude": {
+										"title": "Exclude from HomeKit",
+										"type": "boolean",
+										"required": false
+									}
+								}
+							},
+							"condition": {
+								"functionBody": "return !model.keypads[arrayIndices].exclude;"
+							}
+						},
+						"exclude": {
+							"title": "Exclude from HomeKit",
+							"type": "boolean",
+							"required": false
+						}
+					}
+				}
+			},
+			"occupancysensors": {
+				"type": "array",
+				"required": false,
+				"title": "Occupancy Sensors",
+				"items": {
+					"title": "Occupancy Sensor",
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Room ID",
+							"type": "integer",
+							"required": true,
+							"description": "Be sure to use the Room ID and NOT the Integration ID for the occupancy sensor.",
+							"condition": {
+								"functionBody": "return !model.occupancysensors[arrayIndices].exclude;"
+							}
+						},
+						"name": {
+							"title": "Name",
+							"type": "string",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.occupancysensors[arrayIndices].exclude;"
+							}
+						},
+						"serial": {
+							"title": "Serial Number",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.occupancysensors[arrayIndices].exclude;"
+							}
+						},
+						"model": {
+							"title": "Model",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.occupancysensors[arrayIndices].exclude;"
+							}
+						},
+						"exclude": {
+							"title": "Exclude from HomeKit",
+							"type": "boolean",
+							"required": false
+						}
+					}
+				}
+			},
+			"hvaccontrollers": {
+				"type": "array",
+				"required": false,
+				"title": "HVAC Controllers",
+				"items": {
+					"title": "HVAC Controller",
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Device Integrtion ID",
+							"type": "integer",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.hvaccontrollers[arrayIndices].exclude;"
+							}
+						},
+						"name": {
+							"title": "Name",
+							"type": "string",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.hvaccontrollers[arrayIndices].exclude;"
+							}
+						},
+						"serial": {
+							"title": "Serial Number",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.hvaccontrollers[arrayIndices].exclude;"
+							}
+						},
+						"model": {
+							"title": "Model",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.hvaccontrollers[arrayIndices].exclude;"
+							}
+						},
+						"heatOnly": {
+							"title": "Heat Only",
+							"type": "boolean",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.hvaccontrollers[arrayIndices].exclude;"
+							}
+						},
+						"exclude": {
+							"title": "Exclude from HomeKit",
+							"type": "boolean",
+							"required": false
+						}
+					}
+				}
+			},
+			"visorcontrolreceivers": {
+				"type": "array",
+				"required": false,
+				"title": "Visor Control Receivers",
+				"items": {
+					"title": "Visor Control Receiver",
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Device Integrtion ID",
+							"type": "integer",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.visorcontrolreceivers[arrayIndices].exclude;"
+							}
+						},
+						"name": {
+							"title": "Name",
+							"type": "string",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.visorcontrolreceivers[arrayIndices].exclude;"
+							}
+						},
+						"serial": {
+							"title": "Serial Number",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.visorcontrolreceivers[arrayIndices].exclude;"
+							}
+						},
+						"model": {
+							"title": "Model",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.visorcontrolreceivers[arrayIndices].exclude;"
+							}
+						},
+						"buttons": {
+							"title": "Buttons",
+							"type": "array",
+							"default": [],
+							"required": false,
+							"items": {
+								"title": "Button",
+								"type": "object",
+								"properties": {
+									"id": {
+										"title": "Button ID",
+										"type": "integer",
+										"required": true
+									},
+									"led": {
+										"title": "Button LED ID",
+										"type": "integer",
+										"required": true
+									},
+									"name": {
+										"title": "Name",
+										"type": "string",
+										"required": true
+									},
+									"exclude": {
+										"title": "Exclude from HomeKit",
+										"type": "boolean",
+										"required": false
+									}
+								}
+							},
+							"condition": {
+								"functionBody": "return !model.visorcontrolreceivers[arrayIndices].exclude;"
+							}
+						},
+						"inputs": {
+							"title": "Inputs",
+							"type": "array",
+							"default": [],
+							"required": false,
+							"items": {
+								"title": "Input",
+								"type": "object",
+								"propterties": {
+									"id": {
+										"title": "Input ID",
+										"type": "integer",
+										"required": true
+									},
+									"led": {
+										"title": "Input LED ID",
+										"type": "integer",
+										"required": true
+									},
+									"name": {
+										"title": "Name",
+										"type": "string",
+										"required": true
+									},
+									"exclude": {
+										"title": "Exclude from HomeKit",
+										"type": "boolean",
+										"required": false
+									}
+								}
+							},
+							"condition": {
+								"functionBody": "return !model.visorcontrolreceivers[arrayIndices].exclude;"
+							}
+						},
+						"outputs": {
+							"title": "Outputs",
+							"type": "array",
+							"default": [],
+							"required": false,
+							"items": {
+								"title": "Output",
+								"type": "object",
+								"propterties": {
+									"id": {
+										"title": "Output ID",
+										"type": "integer",
+										"required": true
+									},
+									"name": {
+										"title": "Name",
+										"type": "string",
+										"required": true
+									},
+									"exclude": {
+										"title": "Exclude from HomeKit",
+										"type": "boolean",
+										"required": false
+									}
+								}
+							},
+							"condition": {
+								"functionBody": "return !model.visorcontrolreceivers[arrayIndices].exclude;"
+							}
+						},
+						"exclude": {
+							"title": "Exclude from HomeKit",
+							"type": "boolean",
+							"required": false
+						}
+					}
+				}
+			}
+		}
+	},
+	"form": null,
+	"display": null,
+	"layout": [
+		{
+			"type": "fieldset",
+			"title": "RadioRA2 Platform Settings",
+			"description": "Configuration for the connection to the RadioRA2 system.",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				"name",
+				"repeater",
+				"username",
+				"password"
+			]
+		},
+		{	"type": "fieldset",
+			"title": "Lights",
+			"expandable": true,
+			"expanded": false,
+			"items":[
+				{
+					"key": "lights",
+					"type": "tabarray",
+					"title": "{{ value.name || 'New Light' }}",
+					"items": [
+						"lights[].exclude",
+						"lights[].name",
+						"lights[].id",
+						"lights[].serial",
+						"lights[].model",
+						"lights[].adjustable",
+						"lights[].onvalue"
+					]
+				}
+			]
+		},
+		{
+			"type": "fieldset",
+			"title": "Fans",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				{
+					"key": "fans",
+					"type": "tabarray",
+					"title": "{{ value.name || 'New Fan' }}",
+					"items": [
+						"fans[].exclude",
+						"fans[].name",
+						"fans[].id",
+						"fans[].serial",
+						"fans[].model",
+						"fans[].adjustable",
+						"fans[].onvalue"
+					]
+				}
+			]
+		},
+		{
+			"type": "fieldset",
+			"title": "Keypads",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				{
+					"key": "keypads",
+					"type": "tabarray",
+					"title": "{{ value.name || 'New Keypad' }}",
+					"items": [
+						"keypads[].exclude",
+						"keypads[].name",
+						"keypads[].id",
+						"keypads[].serial",
+						"keypads[].model",
+						"keypads[].stateless",
+						{
+							"type": "section",
+							"key": "keypads[]",
+							"title": "Buttons",
+							"expandable": true,
+							"expanded": false,
+							"items": [
+								{
+									"key": "keypads[].buttons",
+									"type": "tabarray",
+									"title": "{{ value.name || 'New Button' }}",
+									"items": [
+										"keypads[].buttons[].exclude",
+										"keypads[].buttons[].name",
+										"keypads[].buttons[].id",
+										"keypads[].buttons[].led",
+										"keypads[].buttons[].longpressrepeat",
+										"keypads[].buttons[].repeattime",
+										"keypads[].buttons[].repeatmax",
+										"keypads[].buttons[].clicktime"
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "fieldset",
+			"title": "Occupancy Sensors",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				{
+					"key": "occupancysensors",
+					"type": "tabarray",
+					"title": "{{ value.name || 'New Occupancy Sensor' }}",
+					"items": [
+						"occupancysensors[].exclude",
+						"occupancysensors[].name",
+						"occupancysensors[].id",
+						"occupancysensors[].serial",
+						"occupancysensors[].model"
+					]
+				}
+			]
+		},
+		{
+			"type": "fieldset",
+			"title": "HVAC Controllers",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				{
+					"key": "hvaccontrollers",
+					"type": "tabarray",
+					"title": "{{ value.name || 'New HVAC Controller' }}",
+					"items": [
+						"hvaccontrollers[].exclude",
+						"hvaccontrollers[].name",
+						"hvaccontrollers[].id",
+						"hvaccontrollers[].serial",
+						"hvaccontrollers[].model",
+						"hvaccontrollers[].heatOnly"
+					]
+				}
+			]
+		},
+		{
+			"type": "fieldset",
+			"title": "Visor Control Receivers",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				{
+					"key": "visorcontrolreceivers",
+					"type": "tabarray",
+					"title": "{{ value.name || 'New Visor Control Receiver' }}",
+					"items": [
+						"visorcontrolreceivers[].exclude",
+						"visorcontrolreceivers[].name",
+						"visorcontrolreceivers[].id",
+						"visorcontrolreceivers[].serial",
+						"visorcontrolreceivers[].model",
+						{
+							"type": "section",
+							"key": "visorcontrolreceivers[]",
+							"title": "Buttons",
+							"expandable": true,
+							"expanded": false,
+							"items": [
+								{
+									"key": "visorcontrolreceivers[].buttons",
+									"type": "tabarray",
+									"title": "{{ value.name || 'New Button' }}",
+									"items": [
+										"visorcontrolreceivers[].buttons[].exclude",
+										"visorcontrolreceivers[].buttons[].name",
+										"visorcontrolreceivers[].buttons[].id",
+										"visorcontrolreceivers[].buttons[].led"
+									]
+								}
+							]
+						},
+						{
+							"type": "section",
+							"key": "visorcontrolreceivers[]",
+							"title": "Inputs",
+							"expandable": true,
+							"expanded": false,
+							"items": [
+								{
+									"key": "visorcontrolreceivers[].inputs",
+									"type": "tabarray",
+									"title": "{{ value.name || 'New Input' }}",
+									"items": [
+										"visorcontrolreceivers[].inputs[].exclude",
+										"visorcontrolreceivers[].inputs[].name",
+										"visorcontrolreceivers[].inputs[].id",
+										"visorcontrolreceivers[].inputs[].led"
+									]
+								}
+							]
+						},
+						{
+							"type": "section",
+							"key": "visorcontrolreceivers[]",
+							"title": "Outputs",
+							"expandable": true,
+							"expanded": false,
+							"items": [
+								{
+									"key": "visorcontrolreceivers[].outputs",
+									"type": "tabarray",
+									"title": "{{ value.name || 'New Output' }}",
+									"items": [
+										"visorcontrolreceivers[].outputs[].exclude",
+										"visorcontrolreceivers[].outputs[].name",
+										"visorcontrolreceivers[].outputs[].id"
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

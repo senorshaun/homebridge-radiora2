@@ -25,9 +25,9 @@ module.exports = function (homebridge) {
 };
     
 function addDefaultValues(deviceConfig, deviceType) {
-    deviceConfig.name   = (deviceConfig.name   || deviceType + " " + deviceConfig.id ).toString();
-    deviceConfig.model  = (deviceConfig.model  || "Homebridge-RadioRa2-" + deviceType).toString();
-    deviceConfig.serial = (deviceConfig.serial || deviceType + deviceConfig.id	     ).toString();
+    deviceConfig.name   = (deviceConfig.name   || deviceType + " " + deviceConfig.id).toString();
+    deviceConfig.model  = (deviceConfig.model  || "RadioRa2-" + deviceType).toString();
+    deviceConfig.serial = (deviceConfig.serial || deviceType + deviceConfig.id).toString();
     return deviceConfig
 }
 
@@ -37,7 +37,7 @@ class RadioRA2Platform {
     constructor(log, config, api) {
 
 
-        if ((!config) || (!config.repeater) || (!config.username) || (!config.password)) {
+        if ((!config) || (!(config.host || config.repeater)) || (!config.username) || (!config.password)) {
             log.warn("Ignoring Lutron RadioRa2 Platform setup because it is not configured");
             this.disabled = true;
             return;
@@ -51,310 +51,188 @@ class RadioRA2Platform {
         this.setupListeners();
     }
 
-    addFanAccessory(accessoryUUID, fanConfig) {
-
-        let accessoryName = fanConfig.name;
-        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
-
-        accessory.getService(Service.AccessoryInformation)
-            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, (fanConfig.serial|| "Fan" + fanConfig.id).toString());
-
-        let fanService = accessory.addService(Service.Fan, accessoryName);
-
-        this.accessories[accessory.UUID] = new FanAccessory(this.log, fanConfig, accessory, this.radiora2, Homebridge);
-        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
-
-    }
-    
-    addLightAccessory(accessoryUUID, lightConfig) {
-
-        let accessoryName = lightConfig.name;
-        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
-
-        accessory.getService(Service.AccessoryInformation)
-            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, (lightConfig.serial || "Light" + lightConfig.id).toString());
-
-        let lightBulbService = accessory.addService(Service.Lightbulb, accessoryName);
-        if (lightConfig.adjustable) {
-            lightBulbService.addCharacteristic(Characteristic.Brightness);
-        }
-
-        this.accessories[accessory.UUID] = new LightbulbAccessory(this.log, lightConfig, accessory, this.radiora2, Homebridge);
-        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
-
-    }
-
-    addOccupancyAccessory(accessoryUUID, occupancySensorConfig) {
-
-        let accessoryName = occupancySensorConfig.name;
-        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
-
-        accessory.getService(Service.AccessoryInformation)
-            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, (occupancySensorConfig.serial || "Occ" + occupancySensorConfig.id).toString());
-
-        let occupancyService = accessory.addService(Service.OccupancySensor, accessoryName)
-        occupancyService.addOptionalCharacteristic(Characteristic.StatusActive);
-
-        this.accessories[accessory.UUID] = new OccupancySensorAccessory(this.log, occupancySensorConfig, accessory, this.radiora2, Homebridge);
-        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
-
-    }
-
-    addKeypadButtonStatelessAccessory(accessoryUUID, keypadConfig) {
-
-        let accessoryName = keypadConfig.name;
-        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
-
-        accessory.getService(Service.AccessoryInformation)
-            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, (keypadConfig.serial || "Keypad" + keypadConfig.id).toString());
-        
-        let buttonArray = keypadConfig.buttons || [];
-        buttonArray.forEach(function(buttonConfig) {
-            let buttonService = accessory.addService(Service.StatelessProgrammableSwitch, "Button " + buttonConfig.id, "Button " + buttonConfig.id);
-            let switchEventCharacteristic = buttonService.getCharacteristic(Characteristic.ProgrammableSwitchEvent);
-            switchEventCharacteristic.setProps({
-                format: Characteristic.Formats.UINT8,
-                maxValue: 2,
-                minValue: 0,
-                validValues: [0],
-                perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-            });
-            buttonService.getCharacteristic(Characteristic.ServiceLabelIndex).updateValue(buttonConfig.id);
-            buttonService.getCharacteristic(Characteristic.Name).updateValue(buttonConfig.name);
-        }.bind(this));
-
-        this.accessories[accessory.UUID] = new KeypadButtonStatelessAccessory(this.log, keypadConfig, accessory, this.radiora2, Homebridge);
-        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
-
-    }
-
-    addKeypadButtonAccessory(accessoryUUID, keypadConfig) {
-
-        let accessoryName = keypadConfig.name;
-        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
-
-        accessory.getService(Service.AccessoryInformation)
-            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, (keypadConfig.serial || "Keypad" + keypadConfig.id).toString());
-        
-        let buttonArray = keypadConfig.buttons || [];
-        buttonArray.forEach(function(buttonConfig) {
-            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
-        }.bind(this));
-
-        this.accessories[accessory.UUID] = new KeypadButtonAccessory(this.log, keypadConfig, accessory, this.radiora2, Homebridge);
-        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
-
-    }
-
-    addVisorControlReceiverAccessory(accessoryUUID, visorControlConfig) {
-
-        let accessoryName = visorControlConfig.name;
-        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
-
-        accessory.getService(Service.AccessoryInformation)
-            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, (visorControlConfig.serial || "VCR" + visorControlConfig.id).toString());
-        
-        let inputArray = visorControlConfig.inputs || [];
-        inputArray.forEach(function(buttonConfig) {
-            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
-        }.bind(this));
-        let outputArray = visorControlConfig.outputs || [];
-        outputArray.forEach(function(buttonConfig) {
-            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
-        }.bind(this));
-        let buttonArray = visorControlConfig.buttons || [];
-        buttonArray.forEach(function(buttonConfig) {
-            let buttonService = accessory.addService(Service.Switch, buttonConfig.name, buttonConfig.name);
-        }.bind(this));
-
-        this.accessories[accessory.UUID] = new VisorControlReceiverAccessory(this.log, visorControlConfig, accessory, this.radiora2, Homebridge);
-        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
-
-    }
-
-    addThermostatAccessory(accessoryUUID, hvacControllerConfig) {
-
-        let accessoryName = hvacControllerConfig.name;
-        let accessory = new PlatformAccessory(accessoryName, accessoryUUID);
-
-        accessory.getService(Service.AccessoryInformation)
-            .setCharacteristic(Characteristic.Manufacturer, "Lutron")
-            .setCharacteristic(Characteristic.SerialNumber, (hvacControllerConfig.serial || "HVAC" + hvacControllerConfig.id).toString());
-
-        let hvacControllerService = accessory.addService(Service.Thermostat, accessoryName);
-
-        this.accessories[accessory.UUID] = new ThermostatAccessory(this.log, hvacControllerConfig, accessory, this.radiora2, Homebridge);
-        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
-
-    }
-    
     configureAccessory(accessory) {
         this.accessories[accessory.UUID] = accessory;
     }
 
     setupListeners() {
-
-        this.log("Attempting connection to " + this.config.repeater + "...");
-        this.radiora2 = new RadioRa2(this.config.repeater, this.config.username, this.config.password, this.log);
+        
+        let repeaterAddress = this.config.repeater || this.config.hosts;
+        this.log("Attempting connection to " + repeaterAddress + "...");
+        this.radiora2 = new RadioRa2(repeaterAddress, this.config.username, this.config.password, this.log);
         this.radiora2.connect();
 
         this.radiora2.on("loggedIn", function () {
 
-            this.log("Connected to Lutron!");
+            this.log("Logged in to RadioRA2 Main Repeater at " + repeaterAddress);
 
             //////////////////////////
             // Fans
-            let fansArray = this.config.fans || [];
-            fansArray.forEach(function (fanConfig) {
-		fanConfig = addDefaultValues(fanConfig, "Fan");
-                if ((fanConfig.id) && (fanConfig.name)) {
-                    var uuid = UUIDGen.generate("fan:" + fanConfig.id);
-                    let fanAccessory = this.accessories[uuid];
-                    if (!fanAccessory) {
-                        this.addFanAccessory(uuid, fanConfig);
+            let deviceType = "fan";
+            let deviceArray = this.config.fans || [];
+            deviceArray.forEach(function (deviceConfig) {
+                if (!deviceConfig.disabled) {
+                    if (deviceConfig.id) {
+                        deviceConfig = addDefaultValues(deviceConfig, deviceType);
+                        var uuid = UUIDGen.generate(deviceType + ":" + deviceConfig.id);
+                        let deviceAccessory = this.accessories[uuid];
+                        if (!deviceAccessory) {
+                            let accessory = new PlatformAccessory(deviceConfig.name, uuid);
+                            let deviceService = accessory.addService(Service.Fan, deviceConfig.name);
+                            this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+                            deviceAccessory = accessory;
+                        }
+                        this.accessories[uuid] = new FanAccessory(this.log, deviceConfig, (deviceAccessory instanceof FanAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                        this.accessories[uuid].existsInConfig = true;
+                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
-                        this.accessories[uuid] = new FanAccessory(this.log, fanConfig, (fanAccessory instanceof FanAccessory ? fanAccessory.accessory : fanAccessory), this.radiora2, Homebridge);
+                        this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
-                    this.accessories[uuid].existsInConfig = true;
-                    this.log("Loaded fan '" + fanConfig.name + "'");
-                }
-                else {
-                    this.log.warn("Invalid fan in config. Not loading it.");
                 }
             }.bind(this));
-            this.log("Loaded " + fansArray.length + " fan(s)");
+            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Lights
-            let lightsArray = this.config.lights || [];
-            lightsArray.forEach(function (lightConfig) {
-		lightConfig = addDefaultValues(lightConfig, "Light");
-                if ((lightConfig.id) && (lightConfig.name)) {
-                    var uuid = UUIDGen.generate("light:" + lightConfig.id);
-                    let lightAccessory = this.accessories[uuid];
-                    if (!lightAccessory) {
-                        this.addLightAccessory(uuid, lightConfig);
+            deviceType = "light";
+            deviceArray = this.config.lights || [];
+            deviceArray.forEach(function (deviceConfig) {
+                if (!deviceConfig.disabled) {
+                    if (deviceConfig.id) {
+                        deviceConfig = addDefaultValues(deviceConfig, deviceType);
+                        var uuid = UUIDGen.generate(deviceType + ":" + deviceConfig.id);
+                        let deviceAccessory = this.accessories[uuid];
+                        if (!deviceAccessory) {
+                            let accessory = new PlatformAccessory(deviceConfig.name, uuid);
+                            let deviceService = accessory.addService(Service.Lightbulb, deviceConfig.name);
+                            if (deviceConfig.adjustable) {
+                                deviceService.addCharacteristic(Characteristic.Brightness);
+                            }
+                            this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+                            deviceAccessory = accessory;
+                        }
+                        this.accessories[uuid] = new LightbulbAccessory(this.log, deviceConfig, (deviceAccessory instanceof LightbulbAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                        this.accessories[uuid].existsInConfig = true;
+                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
-                        this.accessories[uuid] = new LightbulbAccessory(this.log, lightConfig, (lightAccessory instanceof LightbulbAccessory ? lightAccessory.accessory : lightAccessory), this.radiora2, Homebridge);
+                        this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
-                    this.accessories[uuid].existsInConfig = true;
-                    this.log("Loaded light '" + lightConfig.name + "'");
-                }
-                else {
-                    this.log.warn("Invalid Light in config. Not loading it.");
                 }
             }.bind(this));
-            this.log("Loaded " + lightsArray.length + " light(s)");
+            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Occupancy Sensors
-            let occupancySensorsArray = this.config.occupancysensors || [];
-            occupancySensorsArray.forEach(function (occupancySensorConfig) {
-		occupancySensorConfig = addDefaultValues(occupancySensorConfig, "Occupancy");
-                if ((occupancySensorConfig.id) && (occupancySensorConfig.name)) {
-                    var uuid = UUIDGen.generate("group:" + occupancySensorConfig.id);
-                    let occupancySensorAccessory = this.accessories[uuid];
-                    if (!occupancySensorAccessory) {
-                        this.addOccupancyAccessory(uuid, occupancySensorConfig);
+            deviceType = "occupancy sensor";
+            deviceArray = this.config.occupancysensors || [];
+            deviceArray.forEach(function (deviceConfig) {
+                if (!deviceConfig.disabled) {
+                    if (deviceConfig.id) {
+                        deviceConfig = addDefaultValues(deviceConfig, deviceType);
+                        var uuid = UUIDGen.generate(deviceType + ":" + deviceConfig.id);
+                        let deviceAccessory = this.accessories[uuid];
+                        if (!deviceAccessory) {
+                            let accessory = new PlatformAccessory(deviceConfig.name, uuid);
+                            let deviceService = accessory.addService(Service.OccupancySensor, deviceConfig.name)
+                            deviceService.addOptionalCharacteristic(Characteristic.StatusActive);
+                            this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+                            deviceAccessory = accessory;
+                        }
+                        this.accessories[uuid] = new OccupancySensorAccessory(this.log, deviceConfig, (deviceAccessory instanceof OccupancySensorAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                        this.accessories[uuid].existsInConfig = true;
+                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
-                        this.accessories[uuid] = new OccupancySensorAccessory(this.log, occupancySensorConfig, (occupancySensorAccessory instanceof OccupancySensorAccessory ? occupancySensorAccessory.accessory : occupancySensorAccessory), this.radiora2, Homebridge);
+                        this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
-                    this.accessories[uuid].existsInConfig = true;
-                    this.log("Loaded occupancy sensor '" + occupancySensorConfig.name + "'");
-                }
-                else {
-                    this.log.warn("Invalid occupancy sensor in config. Not loading it.");
                 }
             }.bind(this));
-            this.log("Loaded " + occupancySensorsArray.length + " occupancy sensor(s)");
+            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Keypads
-            let keypadsArray = this.config.keypads || [];
-            keypadsArray.forEach(function (keypadConfig) {
-		keypadConfig = addDefaultValues(keypadConfig, "Keypad");
-                if ((keypadConfig.id) && (keypadConfig.name)) {
-                    var uuid = UUIDGen.generate("keypad:" + keypadConfig.id);
-                    let keypadAccessory = this.accessories[uuid];
-                    if (!keypadAccessory) {
-                        if (keypadConfig.stateless) {
-                            this.addKeypadButtonStatelessAccessory(uuid, keypadConfig);
+            deviceType = "keypad";
+            deviceArray = this.config.keypads || [];
+            deviceArray.forEach(function (deviceConfig) {
+                if (!deviceConfig.disabled) {
+                    if (deviceConfig.id) {
+                        deviceConfig = addDefaultValues(deviceConfig, deviceType);
+                        var uuid = UUIDGen.generate(deviceType + ":" + deviceConfig.id);
+                        let deviceAccessory = this.accessories[uuid];
+                        if (!deviceAccessory) {
+                            let accessory = new PlatformAccessory(deviceConfig.name, uuid);
+                            this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+                            deviceAccessory = accessory;
                         }
-                        else {
-                            this.addKeypadButtonAccessory(uuid, keypadConfig);
+                        if (deviceConfig.stateless) {
+                            this.accessories[uuid] = new KeypadButtonStatelessAccessory(this.log, deviceConfig, (deviceAccessory instanceof KeypadButtonStatelessAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                        } else {
+                            this.accessories[uuid] = new KeypadButtonAccessory(this.log, deviceConfig, (deviceAccessory instanceof KeypadButtonStatelessAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         }
+                        this.accessories[uuid].existsInConfig = true;
+                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
-                        if (keypadConfig.stateless) {
-                            this.accessories[uuid] = new KeypadButtonStatelessAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonStatelessAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
-                        }
-                        else {
-                            this.accessories[uuid] = new KeypadButtonAccessory(this.log, keypadConfig, (keypadAccessory instanceof KeypadButtonAccessory ? keypadAccessory.accessory : keypadAccessory), this.radiora2, Homebridge);
-                        }
+                        this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
-                    this.accessories[uuid].existsInConfig = true;
-                    this.log("Loaded keypad '" + keypadConfig.name + "'");
-                }
-                else {
-                    this.log.warn("Invalid Keypad in config. Not loading it.");
                 }
             }.bind(this));
-            this.log("Loaded " + keypadsArray.length + " keypad(s)");
+            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Visor Control Receivers
-            let visorControlReceiversArray = this.config.visorcontrolreceivers || [];
-            visorControlReceiversArray.forEach(function (visorControlReceiverConfig) {
-		visorControlReceiverConfig = addDefaultValues(visorControlReceiverConfig, "VisorControlReceiver");
-                if ((visorControlReceiverConfig.id) && (visorControlReceiverConfig.name)) {
-                    var uuid = UUIDGen.generate("visorcontrolreceiver:" + visorControlReceiverConfig.id);
-                    let visorControlReceiverAccessory = this.accessories[uuid];
-                    if (!visorControlReceiverAccessory) {
-                        this.addVisorControlReceiverAccessory(uuid, visorControlReceiverConfig);
+            deviceType = "visor control reciever";
+            deviceArray = this.config.visorcontrolreceivers || [];
+            deviceArray.forEach(function (deviceConfig) {
+                if (!deviceConfig.disabled) {
+                    if (deviceConfig.id) {
+                        deviceConfig = addDefaultValues(deviceConfig, deviceType);
+                        var uuid = UUIDGen.generate(deviceType + ":" + deviceConfig.id);
+                        let deviceAccessory = this.accessories[uuid];
+                        if (!deviceAccessory) {
+                            let accessory = new PlatformAccessory(deviceConfig.name, uuid);
+                            this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+                            deviceAccessory = accessory;
+                        }
+                        this.accessories[uuid] = new VisorControlReceiverAccessory(this.log, deviceConfig, (deviceAccessory instanceof VisorControlReceiverAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                        this.accessories[uuid].existsInConfig = true;
+                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
-                        this.accessories[uuid] = new VisorControlReceiverAccessory(this.log, visorControlReceiverConfig, (visorControlReceiverAccessory instanceof VisorControlReceiverAccessory ? visorControlReceiverAccessory.accessory : visorControlReceiverAccessory), this.radiora2, Homebridge);
+                        this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
-                    this.accessories[uuid].existsInConfig = true;
-                    this.log("Loaded visor control receiver '" + visorControlReceiverConfig.name + "'");
-                }
-                else {
-                    this.log.warn("Invalid visor control receiver in config. Not loading it.");
                 }
             }.bind(this));
-            this.log("Loaded " + visorControlReceiversArray.length + " visor control receiver(s)");
+            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // HVAC Controllers
-            let hvacControllersArray = this.config.hvaccontrollers || [];
-            hvacControllersArray.forEach(function (hvacControllerConfig) {
-		hvacControllerConfig = addDefaultValues(hvacControllerConfig, "hvacController");
-                if ((hvacControllerConfig.id) && (hvacControllerConfig.name)) {
-                    var uuid = UUIDGen.generate("hvacController:" + hvacControllerConfig.id);
-                    let hvacControllerAccessory = this.accessories[uuid];
-                    if (!hvacControllerAccessory) {
-                        this.addThermostatAccessory(uuid, hvacControllerConfig);
+            deviceType = "hvac controller";
+            deviceArray = this.config.hvaccontrollers || [];
+            deviceArray.forEach(function (deviceConfig) {
+                if (!deviceConfig.disabled) {
+                    if (deviceConfig.id) {
+                        deviceConfig = addDefaultValues(deviceConfig, deviceType);
+                        var uuid = UUIDGen.generate(deviceType + ":" + deviceConfig.id);
+                        let deviceAccessory = this.accessories[uuid];
+                        if (!deviceAccessory) {
+                            let accessory = new PlatformAccessory(deviceConfig.name, uuid);
+                            let deviceService = accessory.addService(Service.Thermostat, deviceConfig.name);
+                            this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+                            deviceAccessory = accessory;
+                        }
+                        this.accessories[uuid] = new ThermostatAccessory(this.log, deviceConfig, (deviceAccessory instanceof ThermostatAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                        this.accessories[uuid].existsInConfig = true;
+                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
-                        this.accessories[uuid] = new ThermostatAccessory(this.log, hvacControllerConfig, (hvacControllerAccessory instanceof ThermostatAccessory ? hvacControllerAccessory.accessory : hvacControllerAccessory), this.radiora2, Homebridge);
+                        this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
-                    this.accessories[uuid].existsInConfig = true;
-                    this.log("Loaded HVAC controller '" + hvacControllerConfig.name + "'");
-                }
-                else {
-                    this.log.warn("Invalid HVAC controller in config. Not loading it.");
                 }
             }.bind(this));
-            this.log("Loaded " + hvacControllersArray.length + " HVAC controller(s)");
+            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Remove Deleted
@@ -366,7 +244,7 @@ class RadioRA2Platform {
                     this.log("Deleted removed accessory");
                 }
             }.bind(this));
-
+            
         }.bind(this));
         
         //Disconnect cleaning when homebridge is shutting down
