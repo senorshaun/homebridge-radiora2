@@ -59,7 +59,7 @@ class UiServer extends HomebridgePluginUiServer {
         case 'NON_DIM_INC':
         case 'NON_DIM_ELV':
         case 'RELAY_LIGHTING':
-          lights.push(thing);
+          this.lights.push(thing);
           break;
 
         case 'INC':
