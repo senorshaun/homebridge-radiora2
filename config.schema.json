@@ -80,6 +80,7 @@
 							"type": "integer",
 							"minimum": 0,
 							"maximum": 100,
+							"placeholder": 100,
 							"required": false,
 							"description": "Value the light will be set to when turned 'on' by HomeKit. Defaults to 100% if not set.",
 							"condition": {
@@ -143,6 +144,7 @@
 						"onvalue": {
 							"title": "On Value",
 							"type": "integer",
+							"placeholder": 75,
 							"oneOf": [
 								{
 									"enum": [25],
@@ -266,6 +268,7 @@
 										"title": "Repeat Frequency",
 										"type": "integer",
 										"minimum": 0,
+										"placeholder": 500,
 										"required": false,
 										"condition": {
 											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && model.keypads[arrayIndices[0]].stateless && model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].longpressrepeat && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
@@ -276,6 +279,7 @@
 										"title": "Repeat Count",
 										"type": "integer",
 										"minimum": 0,
+										"placeholder": 100,
 										"required": false,
 										"condition": {
 											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && model.keypads[arrayIndices[0]].stateless  && model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].longpressrepeat && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
@@ -286,6 +290,7 @@
 										"title": "Click Time",
 										"type": "integer",
 										"minimum": 0,
+										"placeholder": 500,
 										"required": false,
 										"condition": {
 											"functionBody": "return model.keypads && model.keypads[arrayIndices[0]] && model.keypads[arrayIndices[0]].stateless && !model.keypads[arrayIndices[0]].buttons[arrayIndices[1]].exclude;"
