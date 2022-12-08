@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project should be documented in this file
 
+## [1.5.4] - 2022-12-08
+### Added
+ - Debug logging option to view all interactions
+### Fixed
+ - Undefined variable in stateless keypad buttons 
+
 ## [1.5.2] - 2022-11-17
 ### Added
  - This CHANGELOG

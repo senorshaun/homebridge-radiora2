@@ -29,6 +29,12 @@
 				"type": "string",
 				"required":true
 			},
+			"debug": {
+				"title": "Enable debug logging",
+				"description": "Only enable temporarily, it will fill your log with every RadioRA2 command sent and recevied",
+				"type": "boolean",
+				"required":false
+			},
 			"lights": {
 				"type": "array",
 				"required": false,
@@ -584,7 +590,8 @@
 				"name",
 				"repeater",
 				"username",
-				"password"
+				"password",
+				"debug"
 			]
 		},
 		{	"type": "fieldset",

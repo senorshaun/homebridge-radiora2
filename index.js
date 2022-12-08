@@ -3,6 +3,7 @@
 let RadioRa2 = require('./lib/radiora2');
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
+const logger = require("./lib/logger");
 let FanAccessory = require('./lib/accessories/fan');
 let LightbulbAccessory = require('./lib/accessories/lightbulb');
 let OccupancySensorAccessory = require('./lib/accessories/occupancysensor');
@@ -46,7 +47,7 @@ class RadioRA2Platform {
         this.config = config;
         this.api = api;
         this.accessories = {};
-        this.log = log;
+        this.log = new logger.Logger(log, this.config.debug);
 
         this.setupListeners();
     }
@@ -58,13 +59,13 @@ class RadioRA2Platform {
     setupListeners() {
         
         let repeaterAddress = this.config.repeater || this.config.hosts;
-        this.log("Attempting connection to " + repeaterAddress + "...");
+        this.log.info("Attempting connection to " + repeaterAddress + "...");
         this.radiora2 = new RadioRa2(repeaterAddress, this.config.username, this.config.password, this.log);
         this.radiora2.connect();
 
         this.radiora2.on("loggedIn", function () {
 
-            this.log("Logged in to RadioRA2 Main Repeater at " + repeaterAddress);
+            this.log.info("Logged in to RadioRA2 Main Repeater at " + repeaterAddress);
 
             //////////////////////////
             // Fans
@@ -84,14 +85,14 @@ class RadioRA2Platform {
                         }
                         this.accessories[uuid] = new FanAccessory(this.log, deviceConfig, (deviceAccessory instanceof FanAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
-                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
+                        this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
                         this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
                 }
             }.bind(this));
-            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
+            this.log.info("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Lights
@@ -114,14 +115,14 @@ class RadioRA2Platform {
                         }
                         this.accessories[uuid] = new LightbulbAccessory(this.log, deviceConfig, (deviceAccessory instanceof LightbulbAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
-                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
+                        this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
                         this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
                 }
             }.bind(this));
-            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
+            this.log.info("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Occupancy Sensors
@@ -142,14 +143,14 @@ class RadioRA2Platform {
                         }
                         this.accessories[uuid] = new OccupancySensorAccessory(this.log, deviceConfig, (deviceAccessory instanceof OccupancySensorAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
-                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
+                        this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
                         this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
                 }
             }.bind(this));
-            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
+            this.log.info("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Keypads
@@ -172,14 +173,14 @@ class RadioRA2Platform {
                             this.accessories[uuid] = new KeypadButtonAccessory(this.log, deviceConfig, (deviceAccessory instanceof KeypadButtonStatelessAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         }
                         this.accessories[uuid].existsInConfig = true;
-                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
+                        this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
                         this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
                 }
             }.bind(this));
-            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
+            this.log.info("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Visor Control Receivers
@@ -198,14 +199,14 @@ class RadioRA2Platform {
                         }
                         this.accessories[uuid] = new VisorControlReceiverAccessory(this.log, deviceConfig, (deviceAccessory instanceof VisorControlReceiverAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
-                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
+                        this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
                         this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
                 }
             }.bind(this));
-            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
+            this.log.info("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // HVAC Controllers
@@ -225,14 +226,14 @@ class RadioRA2Platform {
                         }
                         this.accessories[uuid] = new ThermostatAccessory(this.log, deviceConfig, (deviceAccessory instanceof ThermostatAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
-                        this.log("Loaded " + deviceType + " '" + deviceConfig.name + "'");
+                        this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {
                         this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
                     }
                 }
             }.bind(this));
-            this.log("Loaded " + deviceArray.length + " " + deviceType + "(s)");
+            this.log.info("Loaded " + deviceArray.length + " " + deviceType + "(s)");
 
             //////////////////////////
             // Remove Deleted
@@ -241,7 +242,7 @@ class RadioRA2Platform {
                 var thisAccessory = this.accessories[accessoryUuid];
                 if (thisAccessory.existsInConfig !== true) {
                     this.api.unregisterPlatformAccessories(undefined, undefined, [thisAccessory]);
-                    this.log("Deleted removed accessory");
+                    this.log.info("Deleted removed accessory");
                 }
             }.bind(this));
             
