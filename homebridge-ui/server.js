@@ -15,6 +15,8 @@ class UiServer extends HomebridgePluginUiServer {
     this.occupancysensors = [];
     this.hvaccontrollers = [];
     this.visorcontrolreceivers = [];
+    this.windowcoverings = [];
+    //this.ccos = [];
     this.onRequest('/get-all-devices', this.getAllDevices.bind(this));
     // this.ready() must be called to let the UI know you are ready to accept api calls
     this.ready();
@@ -81,25 +83,26 @@ class UiServer extends HomebridgePluginUiServer {
           this.hvaccontrollers.push(thing);
           break;
 
-        //To do: Allow discovery once device types are supported in plugin
-        /*
+
         case 'SYSTEM_SHADE':
         case 'MOTOR':
-          this.windowCoverings.push(thing);
+          this.windowcoverings.push(thing);
           break;
 
         case 'SHEER_BLIND':
           thing.blind = true;
           thing.tilt = "horizontal";
-          this.windowCoverings.push(thing);
+          this.windowcoverings.push(thing);
           break;
 
         case 'VENETIAN_BLIND':
           thing.blind = true;
           thing.tilt = "vertical";
-          this.windowCoverings.push(thing);
+          this.windowcoverings.push(thing);
           break;
 
+        //To do: Allow discovery once device types are supported in plugin
+        /*
         case 'CCO_PULSED':
           thing.pulsed = true;
           this.ccos.push(thing);

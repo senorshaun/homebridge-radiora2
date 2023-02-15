@@ -11,6 +11,7 @@ let KeypadButtonStatelessAccessory = require('./lib/accessories/statelessswitch'
 let KeypadButtonAccessory = require('./lib/accessories/keypadbutton');
 let VisorControlReceiverAccessory = require('./lib/accessories/visorcontrolreceiver')
 let ThermostatAccessory = require('./lib/accessories/hvaccontroller');
+let WindowCoveringAccessory = require('./lib/accessories/windowcovering');
 
 let Homebridge, Accessory, PlatformAccessory, Characteristic, Service, UUIDGen;
 
@@ -225,6 +226,33 @@ class RadioRA2Platform {
                             deviceAccessory = accessory;
                         }
                         this.accessories[uuid] = new ThermostatAccessory(this.log, deviceConfig, (deviceAccessory instanceof ThermostatAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                        this.accessories[uuid].existsInConfig = true;
+                        this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
+                    }
+                    else {
+                        this.log.warn("Invalid " + deviceType + " in config. Not loading it.");
+                    }
+                }
+            }.bind(this));
+            this.log.info("Loaded " + deviceArray.length + " " + deviceType + "(s)");
+
+            //////////////////////////
+            // Window Coverings
+            deviceType = "window covering";
+            deviceArray = this.config.windowcoverings || [];
+            deviceArray.forEach(function (deviceConfig) {
+                if (!deviceConfig.disabled) {
+                    if (deviceConfig.id) {
+                        deviceConfig = addDefaultValues(deviceConfig, deviceType);
+                        var uuid = UUIDGen.generate(deviceType + ":" + deviceConfig.id);
+                        let deviceAccessory = this.accessories[uuid];
+                        if (!deviceAccessory) {
+                            let accessory = new PlatformAccessory(deviceConfig.name, uuid);
+                            let deviceService = accessory.addService(Service.WindowCovering, deviceConfig.name);
+                            this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
+                            deviceAccessory = accessory;
+                        }
+                        this.accessories[uuid] = new WindowCoveringAccessory(this.log, deviceConfig, (deviceAccessory instanceof WindowCoveringAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
                         this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
