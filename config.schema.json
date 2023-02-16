@@ -396,7 +396,7 @@
 							}
 						},
 						"blind": {
-							"title": "Name",
+							"title": "Blind",
 							"type": "boolean",
 							"required": false,
 							"condition": {
@@ -404,7 +404,7 @@
 							}
 						},
 						"tilt": {
-							"title": "Name",
+							"title": "Tilt Type",
 							"type": "string",
 							"required": false,
 							"placeholder": "horizontal",
