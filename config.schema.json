@@ -371,6 +371,81 @@
 					}
 				}
 			},
+			"windowcoverings": {
+				"type": "array",
+				"required": false,
+				"title": "Window Coverings",
+				"items": {
+					"title": "Window Covering",
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Device Integration ID",
+							"type": "integer",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.windowcoverings[arrayIndices].exclude;"
+							}
+						},
+						"name": {
+							"title": "Name",
+							"type": "string",
+							"required": true,
+							"condition": {
+								"functionBody": "return !model.windowcoverings[arrayIndices].exclude;"
+							}
+						},
+						"blind": {
+							"title": "Blind",
+							"type": "boolean",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.windowcoverings[arrayIndices].exclude;"
+							}
+						},
+						"tilt": {
+							"title": "Tilt Type",
+							"type": "string",
+							"required": false,
+							"placeholder": "horizontal",
+							"oneOf": [
+								{
+									"enum": ["horizontal"],
+									"title": "horizontal"
+								},
+								{
+									"enum": ["vertical"],
+									"title": "vertical"
+								}
+							],
+							"condition": {
+								"functionBody": "return model.windowcoverings[arrayIndices].blind && !model.windowcoverings[arrayIndices].exclude;"
+							}
+						},
+						"serial": {
+							"title": "Serial Number",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.windowcoverings[arrayIndices].exclude;"
+							}
+						},
+						"model": {
+							"title": "Model",
+							"type": "string",
+							"required": false,
+							"condition": {
+								"functionBody": "return !model.windowcoverings[arrayIndices].exclude;"
+							}
+						},
+						"exclude": {
+							"title": "Exclude from HomeKit",
+							"type": "boolean",
+							"required": false
+						}
+					}
+				}
+			},
 			"hvaccontrollers": {
 				"type": "array",
 				"required": false,
@@ -698,6 +773,27 @@
 						"occupancysensors[].id",
 						"occupancysensors[].serial",
 						"occupancysensors[].model"
+					]
+				}
+			]
+		},
+		{
+			"type": "fieldset",
+			"title": "Window Coverings",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				{
+					"key": "windowcoverings",
+					"type": "tabarray",
+					"title": "{{ value.name || 'New Window Covering' }}",
+					"items": [
+						"windowcoverings[].exclude",
+						"windowcoverings[].name",
+						"windowcoverings[].blind",
+						"windowcoverings[].id",
+						"windowcoverings[].serial",
+						"windowcoverings[].model"
 					]
 				}
 			]

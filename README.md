@@ -86,6 +86,16 @@ Alternatively, you can run an integration report in Lutron to get the ID numbers
         "exlude": false //
       }
     ],
+    "windowcoverings":[
+      {
+        "name": "Master Bedroom Shades",
+        "id": 7,
+        "serial": "0266473A", //
+        "model": "L", //
+        "blind": false, //
+        "exlude": false //
+      }
+    ],
     "hvaccontrollers":[
       {
         "name": "Living Room Thermostat",

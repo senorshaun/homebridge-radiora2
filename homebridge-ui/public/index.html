@@ -116,6 +116,16 @@
 					}
 					successMessage += 'Added ' + filteredDevices.length + ' new visor control receivers. ';
 				}
+				// add new window coverings
+				if (data.windowcoverings.length > 0 ) {
+					if (config.windowcoverings) {
+						filteredDevices = data.windowcoverings.filter(newdevice => !config.windowcoverings.find(existingdevice => existingdevice.id === newdevice.id));
+					} else {
+						config.windowcoverings = [];
+						filteredDevices = data.windowcoverings;
+					}
+					successMessage += 'Added ' + filteredDevices.length + ' new window coverings. ';
+				}
 				if (successMessage === '') {
 					homebridge.toast.success('No new devices found.');
 				} else {

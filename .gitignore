@@ -1,0 +1,4 @@
+# exclude node_modules from development
+/node_modules
+
+*.DS_Store
