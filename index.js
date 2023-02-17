@@ -12,6 +12,7 @@ let KeypadButtonAccessory = require('./lib/accessories/keypadbutton');
 let VisorControlReceiverAccessory = require('./lib/accessories/visorcontrolreceiver')
 let ThermostatAccessory = require('./lib/accessories/hvaccontroller');
 let WindowCoveringAccessory = require('./lib/accessories/windowcovering');
+let TemperatureSensor = require('./lib/accessories/tempuratesensor');
 
 let Homebridge, Accessory, PlatformAccessory, Characteristic, Service, UUIDGen;
 
@@ -225,8 +226,35 @@ class RadioRA2Platform {
                             this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [accessory]);
                             deviceAccessory = accessory;
                         }
+                        // Temperature Sensors
+                        deviceAccessory.sensors = [];
+                        subdeviceType = "tempurature sensor";
+                        subdeviceArray = deviceConfig.sensors || [];
+                        subdeviceArray.forEach(function (subdeviceConfig) {
+                            if (!subdeviceConfig.disabled) {
+                                if (subdeviceConfig.id) {
+                                    subdeviceConfig = addDefaultValues(subdeviceConfig, subdeviceType);
+                                    var subuuid = UUIDGen.generate(subdeviceType + ":" + subdeviceConfig.id);
+                                    let deviceAccessory = this.accessories[subuuid];
+                                    if (!deviceAccessory) {
+                                        let subaccessory = new PlatformAccessory(subdeviceConfig.name, subuuid);
+                                        let deviceService = subaccessory.addService(Service.TemperatureSensor, subdeviceConfig.name);
+                                        this.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [subaccessory]);
+                                        subdeviceAccessory = subaccessory;
+                                    }
+                                    deviceAccessory.sensors[subuuid]  = new TemperatureSensorAccessory(this.log, subdeviceConfig, (subdeviceAccessory instanceof TemperatureSensorAccessory ? subdeviceAccessory.subaccessory : subdeviceAccessory), this.radiora2, Homebridge);
+                                    this.accessories[subuuid] = deviceAccessory.sensors[subuuid];
+                                    this.accessories[subuuid].existsInConfig = true;
+                                    this.log.debug("Loaded " + subdeviceType + " '" + subdeviceConfig.name + "'");
+                                }
+                                else {
+                                    this.log.warn("Invalid " + subdeviceType + " in config. Not loading it.");
+                                }
+                            }
+                        }).bind(this);
                         this.accessories[uuid] = new ThermostatAccessory(this.log, deviceConfig, (deviceAccessory instanceof ThermostatAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
+                        
                         this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");
                     }
                     else {

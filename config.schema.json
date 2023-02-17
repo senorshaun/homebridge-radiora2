@@ -498,6 +498,58 @@
 							"title": "Exclude from HomeKit",
 							"type": "boolean",
 							"required": false
+						}, 
+						"sensors": {
+							"type": "array",
+							"default": [],
+							"required": false,
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"title": "Sensor ID",
+										"type": "integer",
+										"required": true,
+										"condition": {
+											"functionBody": "return model.hvaccontrollers && model.hvaccontrollers[arrayIndices[0]] && !model.hvaccontrollers[arrayIndices[0]].exclude && !model.hvaccontrollers[arrayIndices[0]].sensors[arrayIndices[1]].exclude;"
+										}
+									},
+									"name": {
+										"title": "Sensor Name",
+										"type": "string",
+										"required": true,
+										"condition": {
+											"functionBody": "return model.hvaccontrollers && model.hvaccontrollers[arrayIndices[0]] && !model.hvaccontrollers[arrayIndices[0]].exclude && !model.hvaccontrollers[arrayIndices[0]].sensors[arrayIndices[1]].exclude;"
+										}
+									},
+									"serial": {
+										"title": "Serial Number",
+										"type": "string",
+										"required": false,
+										"condition": {
+											"functionBody": "return model.hvaccontrollers && model.hvaccontrollers[arrayIndices[0]] && !model.hvaccontrollers[arrayIndices[0]].exclude && !model.hvaccontrollers[arrayIndices[0]].sensors[arrayIndices[1]].exclude;"
+										}
+									},
+									"model": {
+										"title": "Model",
+										"type": "string",
+										"required": false,
+										"placeholder": "LRF2-TWRB",
+										"condition": {
+											"functionBody": "return model.hvaccontrollers && model.hvaccontrollers[arrayIndices[0]] && !model.hvaccontrollers[arrayIndices[0]].exclude && !model.hvaccontrollers[arrayIndices[0]].sensors[arrayIndices[1]].exclude;"
+										}
+									},
+									"exclude": {
+										"title": "Exclude from HomeKit",
+										"type": "boolean",
+										"required": false,
+										"condition": {
+											"functionBody": "return model.hvaccontrollers && model.hvaccontrollers[arrayIndices[0]] && !model.hvaccontrollers[arrayIndices[0]].exclude;"
+										}
+									}
+								}
+							}
+
 						}
 					}
 				}
@@ -814,7 +866,28 @@
 						"hvaccontrollers[].id",
 						"hvaccontrollers[].serial",
 						"hvaccontrollers[].model",
-						"hvaccontrollers[].heatOnly"
+						"hvaccontrollers[].heatOnly",
+						{
+							"type": "section",
+							"key": "hvaccontrollers[]",
+							"title": "Temperature Sensors",
+							"expandable": true,
+							"expanded": false,
+							"items": [
+								{
+									"key": "hvaccontrollers[].sensors",
+									"type": "tabarray",
+									"title": "{{ value.name || 'New Temperature Sensor' }}",
+									"items": [
+										"hvaccontrollers[].sensors[].exclude",
+										"hvaccontrollers[].sensors[].name",
+										"hvaccontrollers[].sensors[].id",
+										"hvaccontrollers[].sensors[].serial",
+										"hvaccontrollers[].sensors[].model"
+									]
+								}
+							]
+						}
 					]
 				}
 			]
