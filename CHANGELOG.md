@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project should be documented in this file
 
+## [1.6.0] - 2023-02-17
+### Added
+ - Window Covering (shades and blinds)
+
 ## [1.5.4] - 2022-12-08
 ### Added
  - Debug logging option to view all interactions
