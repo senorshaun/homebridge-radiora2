@@ -92,7 +92,8 @@ Alternatively, you can run an integration report in Lutron to get the ID numbers
         "id": 7,
         "serial": "0266473A", //
         "model": "L", //
-        "blind": false, //
+        "blind": false, //optional: default = false. Adds a tilt characteristic to the window covering
+        "tilt": "vertical", //optional: default = "horizontal". Sets the tilt direction of the blind
         "exlude": false //
       }
     ],
@@ -103,6 +104,17 @@ Alternatively, you can run an integration report in Lutron to get the ID numbers
         "serial": "0266473A", //
         "model": "LR-HWLV-HVAC", //
         "heatOnly": true, //optional: default = false. Used for heat only situations (no cooling or auto)
+        "sensors": [
+          {
+            "name": "Dining Room Temperature Sensor",
+            "id": 128,
+            "serial": "0854472N", //
+            "model": "LRF2-TWRB", //
+            "batterySwitch": false, //optional: default = false. Adds a switch service activated on low battery for automation purposes
+            "excluce": false //
+
+          }
+        ],
         "exclude": false //
       }
     ],

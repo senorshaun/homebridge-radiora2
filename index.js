@@ -1,7 +1,6 @@
 'use strict';
 
 let RadioRa2 = require('./lib/radiora2');
-const EventEmitter = require('events').EventEmitter;
 const util = require('util');
 const logger = require("./lib/logger");
 let FanAccessory = require('./lib/accessories/fan');
@@ -49,7 +48,7 @@ class RadioRA2Platform {
         this.config = config;
         this.api = api;
         this.accessories = {};
-        this.log = new logger.Logger(log, this.config.debug);
+        this.log = new logger.Logger(log, this.config.debug, this.config.rawMode);
 
         this.setupListeners();
     }
@@ -229,13 +228,13 @@ class RadioRA2Platform {
                         this.accessories[uuid] = new ThermostatAccessory(this.log, deviceConfig, (deviceAccessory instanceof ThermostatAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         this.accessories[uuid].existsInConfig = true;
                         // Temperature Sensors
-                        deviceAccessory.sensors = [];
                         let subdeviceType = "tempurature sensor";
                         let subdeviceArray = deviceConfig.sensors || [];
                         let that = this;
                         subdeviceArray.forEach(function (subdeviceConfig) {
                             if (!subdeviceConfig.disabled) {
                                 if (subdeviceConfig.id) {
+                                    subdeviceConfig.parentId = deviceConfig.id;
                                     subdeviceConfig = addDefaultValues(subdeviceConfig, subdeviceType);
                                     var subuuid = UUIDGen.generate(subdeviceType + ":" + subdeviceConfig.id);
                                     let subdeviceAccessory = that.accessories[subuuid];
@@ -245,8 +244,7 @@ class RadioRA2Platform {
                                         that.api.registerPlatformAccessories("homebridge-radiora2", "RadioRA2", [subaccessory]);
                                         subdeviceAccessory = subaccessory;
                                     }
-                                    deviceAccessory.sensors[subuuid]  = new TemperatureSensorAccessory(that.log, subdeviceConfig, (subdeviceAccessory instanceof TemperatureSensorAccessory ? subdeviceAccessory.accessory : subdeviceAccessory), that.radiora2, Homebridge);
-                                    that.accessories[subuuid] = deviceAccessory.sensors[subuuid];
+                                    that.accessories[subuuid] = new TemperatureSensorAccessory(that.log, subdeviceConfig, (subdeviceAccessory instanceof TemperatureSensorAccessory ? subdeviceAccessory.accessory : subdeviceAccessory), that.radiora2, Homebridge);
                                     that.accessories[subuuid].existsInConfig = true;
                                     that.log.debug("Loaded " + subdeviceType + " '" + subdeviceConfig.name + "'");
                                 }

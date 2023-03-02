@@ -31,6 +31,12 @@
 			},
 			"debug": {
 				"title": "Enable debug logging",
+				"description": "Only enable temporarily, it will fill your log with accessory commands and statuses",
+				"type": "boolean",
+				"required":false
+			},
+			"rawMode": {
+				"title": "Enable raw Lutron logging",
 				"description": "Only enable temporarily, it will fill your log with every RadioRA2 command sent and recevied",
 				"type": "boolean",
 				"required":false
@@ -539,6 +545,14 @@
 											"functionBody": "return model.hvaccontrollers && model.hvaccontrollers[arrayIndices[0]] && !model.hvaccontrollers[arrayIndices[0]].exclude && !model.hvaccontrollers[arrayIndices[0]].sensors[arrayIndices[1]].exclude;"
 										}
 									},
+									"batterySwitch": {
+										"title": "Add battery status switch",
+										"type": "boolean",
+										"required": false,
+										"condition": {
+											"functionBody": "return model.hvaccontrollers && model.hvaccontrollers[arrayIndices[0]] && !model.hvaccontrollers[arrayIndices[0]].exclude && !model.hvaccontrollers[arrayIndices[0]].sensors[arrayIndices[1]].exclude;"
+										}
+									},
 									"exclude": {
 										"title": "Exclude from HomeKit",
 										"type": "boolean",
@@ -718,7 +732,8 @@
 				"repeater",
 				"username",
 				"password",
-				"debug"
+				"debug",
+				"rawMode"
 			]
 		},
 		{	"type": "fieldset",
@@ -883,7 +898,8 @@
 										"hvaccontrollers[].sensors[].name",
 										"hvaccontrollers[].sensors[].id",
 										"hvaccontrollers[].sensors[].serial",
-										"hvaccontrollers[].sensors[].model"
+										"hvaccontrollers[].sensors[].model",
+										"hvaccontrollers[].sensors[].batterySwitch"
 									]
 								}
 							]

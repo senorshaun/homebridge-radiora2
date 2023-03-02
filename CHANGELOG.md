@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project should be documented in this file
 
+## [1.7.0] - 2023-03-02
+### Added
+ - Temperature Sensors (report battery and active state and averaged thermostat temp)
+### Fixed
+ - Fixed the moving state for Window Coverings
+ - Fixed issue in which pico buttons were not correctly triggering in Homekit
+ - Cleaned up debug logging output, seperating the raw lutron logs to a seperate switch
+ - Code cleanup
+
+
 ## [1.6.0] - 2023-02-17
 ### Added
  - Window Covering (shades and blinds)
