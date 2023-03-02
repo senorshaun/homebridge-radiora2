@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project should be documented in this file
 
+## [1.7.1] - 2023-03-02
+### Fixed
+ - Bug Fix
+
+
 ## [1.7.0] - 2023-03-02
 ### Added
  - Temperature Sensors (report battery and active state and averaged thermostat temp)
