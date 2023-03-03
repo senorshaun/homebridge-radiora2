@@ -1,10 +1,14 @@
 # Changelog
 All notable changes to this project should be documented in this file
 
+
+## [1.7.2] - 2023-03-03
+### Fixed
+ - Bug Fix for dimmers
+
 ## [1.7.1] - 2023-03-02
 ### Fixed
  - Bug Fix
-
 
 ## [1.7.0] - 2023-03-02
 ### Added
