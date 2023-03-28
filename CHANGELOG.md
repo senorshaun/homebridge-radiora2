@@ -2,6 +2,12 @@
 All notable changes to this project should be documented in this file
 
 
+## [1.7.3] - 2023-03-28
+### Fixed
+ - Bug Fix for on level when not setting max brightness/speed for dimmers and fans
+### Changed
+ - Sped up the rate commands are sent to the main repeater
+
 ## [1.7.2] - 2023-03-03
 ### Fixed
  - Bug Fix for dimmers
