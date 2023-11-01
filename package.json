@@ -1,6 +1,6 @@
 {
   "name": "homebridge-radiora2",
-  "version": "1.7.3",
+  "version": "1.7.4-beta.0",
   "description": "Homebridge Platform for Lutron RadioRa2",
   "main": "index.js",
   "scripts": {
