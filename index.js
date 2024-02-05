@@ -171,7 +171,7 @@ class RadioRA2Platform {
                         if (deviceConfig.stateless) {
                             this.accessories[uuid] = new KeypadButtonStatelessAccessory(this.log, deviceConfig, (deviceAccessory instanceof KeypadButtonStatelessAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         } else {
-                            this.accessories[uuid] = new KeypadButtonAccessory(this.log, deviceConfig, (deviceAccessory instanceof KeypadButtonStatelessAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
+                            this.accessories[uuid] = new KeypadButtonAccessory(this.log, deviceConfig, (deviceAccessory instanceof KeypadButtonAccessory ? deviceAccessory.accessory : deviceAccessory), this.radiora2, Homebridge);
                         }
                         this.accessories[uuid].existsInConfig = true;
                         this.log.debug("Loaded " + deviceType + " '" + deviceConfig.name + "'");

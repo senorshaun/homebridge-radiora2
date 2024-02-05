@@ -106,6 +106,17 @@
 					config.hvaccontrollers.push(...filteredDevices);
 					successMessage += 'Added ' + filteredDevices.length + ' new hvac controllers. ';
 				}
+				// add new hvac controllers
+				if (data.temperaturesensors.length > 0 ) {
+					if (config.temperaturesensors) {
+						filteredDevices = data.temperaturesensors.filter(newdevice => !config.temperaturesensors.find(existingdevice => existingdevice.id === newdevice.id));
+					} else {
+						config.temperaturesensors = [];
+						filteredDevices = data.temperaturesensors;
+					}
+					config.temperaturesensors.push(...filteredDevices);
+					successMessage += 'Added ' + filteredDevices.length + ' new temperature sensors. ';
+				}
 				// add new visor control receivers
 				if (data.visorcontrolreceivers.length > 0 ) {
 					if (config.visorcontrolreceivers) {

@@ -14,6 +14,7 @@ class UiServer extends HomebridgePluginUiServer {
     this.keypads = [];
     this.occupancysensors = [];
     this.hvaccontrollers = [];
+    this.temperaturesensors = [];
     this.visorcontrolreceivers = [];
     this.windowcoverings = [];
     //this.ccos = [];
@@ -174,13 +175,11 @@ class UiServer extends HomebridgePluginUiServer {
           this.visorcontrolreceivers.push(thing);
           break;
 
-        //To do: Allow discovery once device types are supported in plugin
-        /*
         case 'TEMPERATURE_SENSOR':
           thing.tempSensor = true;
-          hvaccontrollers.push(thing);
+          this.temperaturesensors.push(thing);
           break;
-        */
+        
       }
     }
     Promise.resolve;
@@ -252,7 +251,9 @@ class UiServer extends HomebridgePluginUiServer {
         keypads: this.keypads,
         occupancysensors: this.occupancysensors,
         hvaccontrollers: this.hvaccontrollers,
-        visorcontrolreceivers: this.visorcontrolreceivers
+        temperaturesensors: this.temperaturesensors,
+        visorcontrolreceivers: this.visorcontrolreceivers,
+        windowcoverings: this.windowcoverings
       }
 
     } else {
