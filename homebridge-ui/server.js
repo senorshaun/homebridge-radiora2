@@ -24,35 +24,35 @@ class UiServer extends HomebridgePluginUiServer {
   }
   
   async processAreas(areas) {
-    if(areas.hasOwnProperty("Area")) {
+    if(areas.Area) {
       await Promise.all(areas.Area.map(area => this.processArea(area)));
     }
   }
   async processArea(area) {
-    if (area.hasOwnProperty("Areas")) {
+    if (area.Areas) {
       await Promise.all(area.Areas.map(areas => this.processAreas(areas)));
     }
-    if (area.hasOwnProperty("$")) {
-      if (area.hasOwnProperty("Outputs")) {
+    if (area.$) {
+      if (area.Outputs) {
         await Promise.all(area.Outputs.map(outputs => this.processOutputs(outputs, area.$)));
       }
-      if (area.hasOwnProperty("DeviceGroups")) {
+      if (area.DeviceGroups) {
         await Promise.all(area.DeviceGroups.map(deviceGroups => this.processDeviceGroups(deviceGroups, area.$)));
       }
-      if (area.hasOwnProperty("HVACS")) {
+      if (area.HVACS) {
         await Promise.all(area.HVACS.map(hvacs => this.processHVACS(hvacs)));
       }
     }
   }
 
   async processOutputs(outputs, areaInfo) {
-    if (outputs.hasOwnProperty("Output")) {
+    if (outputs.Output) {
       await Promise.all(outputs.Output.map(output => this.processOutput(output, areaInfo)));
     }
   }
 
   processOutput(output, areaInfo) {
-    if (output.hasOwnProperty("$")) {
+    if (output.$) {
       let thing = {
         name : areaInfo.Name + " " + output.$.Name,
         id : Number(output.$.IntegrationID)
@@ -120,36 +120,36 @@ class UiServer extends HomebridgePluginUiServer {
   }
 
   async processDeviceGroups(deviceGroups, areaInfo) {
-    if (deviceGroups.hasOwnProperty("DeviceGroup")) {
+    if (deviceGroups.DeviceGroup) {
       await Promise.all(deviceGroups.DeviceGroup.map(deviceGroup => this.processDeviceGroup(deviceGroup, areaInfo)));
     }
-    if (deviceGroups.hasOwnProperty("Device")) {
+    if (deviceGroups.Device) {
       await Promise.all(deviceGroups.Device.map(device => this.processDevice(device, areaInfo)));
     }
   }
 
   async processDeviceGroup(deviceGroup, areaInfo) {
-    if (deviceGroup.hasOwnProperty("Devices")) {
+    if (deviceGroup.Devices) {
       await Promise.all(deviceGroup.Devices.map(devices => this.processDevices(devices, areaInfo)));
     }
   }
 
   async processDevices(devices, areaInfo) {
-    if (devices.hasOwnProperty("Device")) {
+    if (devices.Device) {
       await Promise.all(devices.Device.map(device => this.processDevice(device, areaInfo)));
     }
   }
 
   async processDevice(device, areaInfo) {
-    if (device.hasOwnProperty("Device")) {
+    if (device.Device) {
        await Promise.all(device.Device.map(device => this.processDevice(device, areaInfo)));
     }
-    if (device.hasOwnProperty("$")) {
+    if (device.$) {
       let thing = {
         name : areaInfo.Name + " " + device.$.Name,
         id : Number(device.$.IntegrationID)
       };
-      if (device.$.hasOwnProperty("SerialNumber")) {
+      if (device.$.SerialNumber) {
         thing.serial = String(device.$.SerialNumber);
       }
 
@@ -186,13 +186,13 @@ class UiServer extends HomebridgePluginUiServer {
   }
 
   async processComponents(components, thing, deviceType) {
-    if (components.hasOwnProperty("Component")) {
+    if (components.Component) {
       await Promise.all(components.Component.map(component => this.processComponent(component, thing, deviceType)));
     }
   }
 
   async processComponent(component, thing, deviceType) {
-    if (component.hasOwnProperty("$")) {
+    if (component.$) {
       switch (component.$.ComponentType) {
         case 'BUTTON':
           await Promise.all(component.Button.map(button => this.processButton(button, component.$, thing, deviceType)));
@@ -202,13 +202,13 @@ class UiServer extends HomebridgePluginUiServer {
   }
 
   processButton(button, componentInfo, thing, deviceType) {
-    if (button.hasOwnProperty("$")) {
-      if (button.$.hasOwnProperty("Engraving")){
+    if (button.$) {
+      if (button.$.Engraving){
         var ledOffset = 80;
         if (deviceType === 'MAIN_REPEATER') {
           ledOffset = 100;
         }
-        if (!thing.hasOwnProperty("buttons")) {
+        if (!thing.buttons) {
           thing.buttons = [];
         }
         thing.buttons.push({
@@ -222,13 +222,13 @@ class UiServer extends HomebridgePluginUiServer {
   }
 
   async processHVACS(hvacs) {
-    if(hvacs.hasOwnProperty("hvac")) {
+    if(hvacs.hvac) {
       await Promise.all(hvacs.HVAC.map(hvac => this.processHVAC(hvac)));
     }
   }
 
   processHVAC(hvac) {
-    if (hvac.hasOwnProperty("$")) {
+    if (hvac.$) {
       if (!hvac.$.AvailableOperatingModes.includes("Cool")) {
         this.hvaccontrollers.find(hvaccontroller => {hvaccontroller.id === hvac.IntegrationID}).heatOnly = true;
       }
