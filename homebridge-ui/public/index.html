@@ -125,6 +125,7 @@
 						config.visorcontrolreceivers = [];
 						filteredDevices = data.visorcontrolreceivers;
 					}
+					config.visorcontrolreceivers.push(...filteredDevices);
 					successMessage += 'Added ' + filteredDevices.length + ' new visor control receivers. ';
 				}
 				// add new window coverings
@@ -135,6 +136,7 @@
 						config.windowcoverings = [];
 						filteredDevices = data.windowcoverings;
 					}
+					config.windowcoverings.push(...filteredDevices);
 					successMessage += 'Added ' + filteredDevices.length + ' new window coverings. ';
 				}
 				if (successMessage === '') {
