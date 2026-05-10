@@ -1,7 +1,6 @@
 const {
   HomebridgePluginUiServer
 } = require('@homebridge/plugin-ui-utils');
-const axios = require('axios');
 var parseStringPromise = require('xml2js').parseStringPromise;
 
 class UiServer extends HomebridgePluginUiServer {
@@ -237,12 +236,18 @@ class UiServer extends HomebridgePluginUiServer {
   }
 
   async getAllDevices(params) {
+    try {
+      const response = await fetch(`http://${params.repeater}/DbXmlInfo.xml`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      }
 
-    // try to fetch the xml
-    const response = await axios.get("http://" + params.repeater + "/DbXmlInfo.xml");
-    if (response.status == 200) {
-      const result = await parseStringPromise(response.data);
-      await Promise.all(result.Project.Areas.map(areas => this.processAreas(areas)));
+      const xml = await response.text();
+      const result = await parseStringPromise(xml);
+      const areas = result?.Project?.Areas ?? [];
+      await Promise.all(
+        areas.map(area => this.processAreas(area))
+      );
 
       return {
         success: true,
@@ -254,13 +259,13 @@ class UiServer extends HomebridgePluginUiServer {
         temperaturesensors: this.temperaturesensors,
         visorcontrolreceivers: this.visorcontrolreceivers,
         windowcoverings: this.windowcoverings
-      }
+      };
 
-    } else {
+    } catch (err) {
       return {
         success: false,
-        error: '! Unable to discover devices'
-      }
+        error: err.message || 'Unable to discover devices'
+      };
     }
   }
 }
