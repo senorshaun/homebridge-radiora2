@@ -23,6 +23,14 @@ module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
     UUIDGen = homebridge.hap.uuid;
 
+    // Homebridge v1 compatibility shims (safe no-ops on v2 where they already exist)
+    if (!Accessory.prototype.getServiceById) {
+        Accessory.prototype.getServiceById = Accessory.prototype.getServiceByUUIDAndSubType;
+    }
+    if (!Service.Battery) {
+        Service.Battery = Service.BatteryService;
+    }
+
     homebridge.registerPlatform('homebridge-radiora2', 'RadioRA2', RadioRA2Platform, true);
 };
     
