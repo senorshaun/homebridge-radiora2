@@ -1,11 +1,6 @@
 # Changelog
 All notable changes to this project should be documented in this file
 
-## [2.0.0] - 2026-05-10
-### Changed
- - Homebridge v2 compatibility
- - Node v22/24 requirement
-
 
 ## [1.7.3] - 2023-03-28
 ### Fixed
